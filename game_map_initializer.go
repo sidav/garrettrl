@@ -1,6 +1,9 @@
 package main
 
-import cw "github.com/sidav/golibrl/console"
+import (
+	cw "github.com/sidav/golibrl/console"
+	generator2 "parcelcreationtool/generator"
+)
 
 var testMap = []string{
 	"########################",
@@ -23,6 +26,20 @@ func (dung *gameMap) initTilesArrayForSize(sx, sy int) {
 	for i := range dung.tiles {
 		dung.tiles[i] = make([]d_tile, sy)
 	}
+}
+
+func (dung *gameMap) generateTiledMap() {
+	generator := generator2.Generator{}
+	generatedMap := generator.Generate("parcels", "templates", 0, 0, 9)
+	generatedMapString := make([]string, 0)
+	for i := range generatedMap.Terrain {
+		currStr := ""
+		for j := range generatedMap.Terrain[i] {
+			currStr += string(generatedMap.Terrain[i][j])
+		}
+		generatedMapString = append(generatedMapString, currStr)
+	}
+	dung.MakeMapFromGenerated(&generatedMapString)
 }
 
 func (dung *gameMap) init_placeItemsAndEnemies() {

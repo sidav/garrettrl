@@ -65,7 +65,7 @@ type d_tile struct {
 func (t *d_tile) getAppearance() *consoleCell {
 	if t.isOpened {
 		return &consoleCell{
-			appearance: '\'',
+			appearance: '\\',
 			color:      cw.DARK_MAGENTA,
 			inverse:    false,
 		}
