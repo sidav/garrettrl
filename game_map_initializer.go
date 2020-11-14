@@ -67,6 +67,21 @@ func (dung *gameMap) MakeMapFromGenerated(generated_map *[]string) {
 		name:          "Guard",
 		ai:            &aiData{},
 	})
+	dung.pawns = append(dung.pawns, &pawn{
+		ccell:         &consoleCell{
+			appearance: 'G',
+			color:      cw.RED,
+			inverse:    false,
+		},
+		hp:            0,
+		maxhp:         0,
+		x:             7,
+		y:             7,
+		nextTurnToAct: 0,
+		sightRange:    6,
+		name:          "Guard",
+		ai:            &aiData{},
+	})
 }
 
 

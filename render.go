@@ -125,6 +125,10 @@ func renderPawn(p *pawn, inverse bool) {
 		}
 
 	}
+	if p == CURRENT_MAP.player && CURRENT_MAP.tiles[p.x][p.y].lightLevel == 0 {
+		renderCcellForceColor(p.ccell, x, y, darkColor)
+		return
+	}
 	renderCcell(p.ccell, x, y)
 	cw.SetBgColor(cw.BLACK)
 }
