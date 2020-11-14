@@ -9,6 +9,7 @@ var (
 	R_VIEWPORT_HEIGHT  = 20
 	R_VIEWPORT_CURR_X  = 0
 	R_VIEWPORT_CURR_Y  = 0
+	R_UI_COLOR = cw.DARK_BLUE
 	RENDER_DISABLE_LOS bool
 )
 
@@ -35,6 +36,18 @@ func updateBoundsIfNeccessary(force bool) {
 //	return x - R_VIEWPORT_CURR_X < R_VIEWPORT_WIDTH && y - R_VIEWPORT_CURR_Y < R_VIEWPORT_HEIGHT
 //}
 
+func r_renderUiOutline() {
+	w, _ := cw.GetConsoleSize()
+	cw.SetBgColor(R_UI_COLOR)
+	for x := 0; x < w; x++ {
+		// cw.PutChar(' ', x, 0)
+		cw.PutChar(' ', x, R_VIEWPORT_HEIGHT)
+	}
+	for y := 0; y < R_VIEWPORT_HEIGHT; y++ {
+		cw.PutChar(' ', R_VIEWPORT_WIDTH, y)
+	}
+}
+
 func r_CoordsToViewport(x, y int) (int, int) {
 	vpx, vpy := x-R_VIEWPORT_CURR_X, y-R_VIEWPORT_CURR_Y
 	if vpx >= R_VIEWPORT_WIDTH || vpy >= R_VIEWPORT_HEIGHT {
@@ -52,6 +65,7 @@ func renderLevel(d *gameMap, flush bool) {
 	updateBoundsIfNeccessary(false)
 	cw.Clear_console()
 	updateViewportCoords(d.player)
+	r_renderUiOutline()
 	// render level. vpx, vpy are viewport coords, whereas x, y are real coords.
 	for x := R_VIEWPORT_CURR_X; x < R_VIEWPORT_CURR_X+R_VIEWPORT_WIDTH; x++ {
 		for y := 0; y < R_VIEWPORT_CURR_Y+R_VIEWPORT_HEIGHT; y++ {
