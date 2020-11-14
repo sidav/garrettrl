@@ -50,7 +50,8 @@ func (dung *gameMap) MakeMapFromGenerated(generated_map *[]string) {
 			}
 		}
 	}
-	dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TORCH, x: 4, y: 5})
+	// dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TORCH, x: 4, y: 5})
+	dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TORCH, x: 1, y: 7})
 	dung.pawns = append(dung.pawns, &pawn{
 		ccell:         &consoleCell{
 			appearance: 'G',

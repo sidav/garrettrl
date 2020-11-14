@@ -19,6 +19,7 @@ func (p *pawn) ai_checkSituation() {
 	case AI_ROAM:
 		p.ai_checkRoam()
 	case AI_ALERTED:
+		p.ai_checkAlerted()
 	}
 }
 

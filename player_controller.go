@@ -22,6 +22,8 @@ func (p *playerController) playerControl(d *gameMap) {
 				CURRENT_MAP.player.spendTurnsForAction(10)
 			case "ESCAPE":
 				GAME_IS_RUNNING = false
+			case "INSERT":
+				RENDER_DISABLE_LOS = !RENDER_DISABLE_LOS
 			default:
 				valid_key_pressed = false
 				log.AppendMessagef("Unknown key %s (Wrong keyboard layout?)", key_pressed)
