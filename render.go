@@ -51,7 +51,6 @@ func updateViewportCoords(p *pawn) {
 func renderLevel(d *gameMap, flush bool) {
 	updateBoundsIfNeccessary(false)
 	cw.Clear_console()
-	vismap := *(d.getFieldOfVisionFor(d.player))
 	updateViewportCoords(d.player)
 	// render level. vpx, vpy are viewport coords, whereas x, y are real coords.
 	for x := R_VIEWPORT_CURR_X; x < R_VIEWPORT_CURR_X+R_VIEWPORT_WIDTH; x++ {
@@ -62,7 +61,7 @@ func renderLevel(d *gameMap, flush bool) {
 			}
 			cell := d.tiles[x][y].getAppearance()
 			// is seen right now
-			if RENDER_DISABLE_LOS || vismap[x][y] {
+			if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
 				d.tiles[x][y].wasSeenByPlayer = true
 				if d.tiles[x][y].lightLevel > 0 || d.tiles[x][y].isOpaque() {
 					renderCcell(cell, vpx, vpy)
@@ -79,21 +78,21 @@ func renderLevel(d *gameMap, flush bool) {
 	}
 	//render items
 	//for _, item := range d.items {
-	//	if RENDER_DISABLE_LOS || vismap[item.x][item.y] {
+	//	if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[item.x][item.y] {
 	//		renderItem(item)
 	//	}
 	//}
 
 	//render pawns
 	for _, pawn := range d.pawns {
-		if RENDER_DISABLE_LOS || vismap[pawn.x][pawn.y] {
+		if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[pawn.x][pawn.y] {
 			renderPawn(pawn, false)
 		}
 	}
 
 	// render furniture
 	for _, furniture := range d.furnitures {
-		if RENDER_DISABLE_LOS || vismap[furniture.x][furniture.y] {
+		if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[furniture.x][furniture.y] {
 			x, y := r_CoordsToViewport(furniture.x, furniture.y)
 			renderCcell(furniture.getStaticData().appearance, x, y)
 		}
@@ -118,6 +117,14 @@ func renderLevel(d *gameMap, flush bool) {
 
 func renderPawn(p *pawn, inverse bool) {
 	x, y := r_CoordsToViewport(p.x, p.y)
+	if p.ai != nil {
+		switch p.ai.currentState {
+		case AI_ALERTED:
+			renderCcellForceChar(p.ccell, x, y, '!')
+			return
+		}
+
+	}
 	renderCcell(p.ccell, x, y)
 	cw.SetBgColor(cw.BLACK)
 }
@@ -320,6 +327,18 @@ func renderCcellForceColor(cc *consoleCell, x, y int, color int) {
 	}
 	cw.PutChar(cc.appearance, x, y)
 }
+
+func renderCcellForceChar(cc *consoleCell, x, y int, char rune) {
+	if cc.inverse {
+		cw.SetFgColor(cw.BLACK)
+		cw.SetBgColor(cc.color)
+	} else {
+		cw.SetFgColor(cc.color)
+		cw.SetBgColor(cw.BLACK)
+	}
+	cw.PutChar(char, x, y)
+}
+
 
 //func renderLine(char rune, fromx, fromy, tox, toy int, flush, exceptFirstAndLast bool) {
 //	line := routines.GetLine(fromx, fromy, tox, toy)

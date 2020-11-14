@@ -59,6 +59,7 @@ func (g *game) runGame() {
 
 	for GAME_IS_RUNNING {
 		CURRENT_MAP.recalculateLights()
+		CURRENT_MAP.currentPlayerVisibilityMap = *CURRENT_MAP.getFieldOfVisionFor(CURRENT_MAP.player)
 		renderLevel(&CURRENT_MAP, true)
 		pc.playerControl(&CURRENT_MAP)
 

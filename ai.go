@@ -15,7 +15,11 @@ type aiData struct {
 }
 
 func (p *pawn) ai_checkSituation() {
-
+	switch p.ai.currentState {
+	case AI_ROAM:
+		p.ai_checkRoam()
+	case AI_ALERTED:
+	}
 }
 
 func (p *pawn) ai_act() {
@@ -24,6 +28,19 @@ func (p *pawn) ai_act() {
 		p.ai_actRoam()
 	case AI_ALERTED:
 	}
+}
+
+func (p *pawn) ai_checkRoam() {
+	x, y := p.getCoords()
+	px, py := CURRENT_MAP.player.getCoords()
+	if CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
+		if CURRENT_MAP.tiles[px][py].lightLevel > 0 {
+			p.ai.targetPawn = CURRENT_MAP.player
+			p.ai.currentState = AI_ALERTED
+			return
+		}
+	}
+	p.ai.currentState = AI_ROAM
 }
 
 func (p *pawn) ai_actRoam() {
@@ -38,4 +55,17 @@ func (p *pawn) ai_actRoam() {
 		ai.dirx = 0
 		ai.diry = 0
 	}
+}
+
+func (p *pawn) ai_checkAlerted() {
+	x, y := p.getCoords()
+	px, py := CURRENT_MAP.player.getCoords()
+	if CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
+		if CURRENT_MAP.tiles[px][py].lightLevel > 0 {
+			p.ai.targetPawn = CURRENT_MAP.player
+			p.ai.currentState = AI_ALERTED
+			return
+		}
+	}
+	p.ai.currentState = AI_ROAM
 }

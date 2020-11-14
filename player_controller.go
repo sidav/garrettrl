@@ -18,6 +18,8 @@ func (p *playerController) playerControl(d *gameMap) {
 		movex, movey = p.keyToDirection(key_pressed)
 		if movex == 0 && movey == 0 {
 			switch key_pressed {
+			case "5":
+				CURRENT_MAP.player.spendTurnsForAction(10)
 			case "ESCAPE":
 				GAME_IS_RUNNING = false
 			default:
