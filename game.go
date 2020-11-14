@@ -65,7 +65,11 @@ func (g *game) runGame() {
 		// check if pawns should be removed
 		for i := 0; i < len(CURRENT_MAP.pawns); i++ {
 			if CURRENT_MAP.pawns[i].isTimeToAct() {
-				// act for pawns here
+				// ai_act for pawns here
+				if CURRENT_MAP.pawns[i].ai != nil {
+					CURRENT_MAP.pawns[i].ai_checkSituation()
+					CURRENT_MAP.pawns[i].ai_act()
+				}
 			}
 		}
 		CURRENT_TURN++

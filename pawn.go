@@ -5,6 +5,7 @@ type (
 		ccell                                      *consoleCell
 		hp, maxhp, x, y, nextTurnToAct, sightRange int
 		name                                       string
+		ai *aiData
 	}
 )
 
