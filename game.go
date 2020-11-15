@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/sidav/golibrl/console"
 	"github.com/sidav/golibrl/random/additive_random"
 	log2 "gorltemplate/game_log"
 )
@@ -38,24 +37,7 @@ func (g *game) runGame() {
 
 	GAME_IS_RUNNING = true
 	CURRENT_MAP = gameMap{}
-	CURRENT_MAP.initialize_level()
-	CURRENT_MAP.MakeMapFromGenerated(&testMap)
-
-
-	CURRENT_MAP.player = &pawn{
-		ccell:         &consoleCell{
-			appearance: '@',
-			color:      console.WHITE,
-			inverse:    false,
-		},
-		hp:            0,
-		maxhp:         0,
-		x:             1,
-		y:             1,
-		nextTurnToAct: 0,
-		sightRange:    10,
-		name:          "",
-	}
+	CURRENT_MAP.generateAndInitMap() // applyRuneMap(&testMap)
 
 	for GAME_IS_RUNNING {
 		CURRENT_MAP.recalculateLights()

@@ -28,7 +28,8 @@ func (dung *gameMap) initTilesArrayForSize(sx, sy int) {
 	}
 }
 
-func (dung *gameMap) generateTiledMap() {
+func (dung *gameMap) generateAndInitMap() {
+	dung.initialize_level()
 	generator := generator2.Generator{}
 	generatedMap := generator.Generate("parcels", "templates", 0, 0, 9)
 	generatedMapString := make([]string, 0)
@@ -39,14 +40,13 @@ func (dung *gameMap) generateTiledMap() {
 		}
 		generatedMapString = append(generatedMapString, currStr)
 	}
-	dung.MakeMapFromGenerated(&generatedMapString)
+	dung.applyRuneMap(&generatedMapString)
+	dung.spawnPlayer(generatedMap)
+	dung.spawnFurniture(generatedMap)
+	dung.spawnEnemiesAtRoutes(generatedMap)
 }
 
-func (dung *gameMap) init_placeItemsAndEnemies() {
-
-}
-
-func (dung *gameMap) MakeMapFromGenerated(generated_map *[]string) {
+func (dung *gameMap) applyRuneMap(generated_map *[]string) {
 	levelsizex = len(*generated_map)
 	levelsizey = len((*generated_map)[0])
 	dung.initTilesArrayForSize(levelsizex, levelsizey)
@@ -68,7 +68,6 @@ func (dung *gameMap) MakeMapFromGenerated(generated_map *[]string) {
 		}
 	}
 	// dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TORCH, x: 4, y: 5})
-	dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TORCH, x: 1, y: 7})
 	dung.pawns = append(dung.pawns, &pawn{
 		ccell:         &consoleCell{
 			appearance: 'G',
@@ -102,11 +101,57 @@ func (dung *gameMap) MakeMapFromGenerated(generated_map *[]string) {
 }
 
 
-func (dung *gameMap) spawnPlayerAtRandomPosition() {
+func (dung *gameMap) spawnPlayer(l *generator2.Level) {
+	CURRENT_MAP.player = &pawn{
+		ccell:         &consoleCell{
+			appearance: '@',
+			color:      cw.WHITE,
+			inverse:    false,
+		},
+		hp:            0,
+		maxhp:         0,
+		x:             1,
+		y:             1,
+		nextTurnToAct: 0,
+		sightRange:    10,
+		name:          "",
+	}
+	// check if generated map has an entry point
+	for _, i := range l.Items {
+		if i.Name == "ENTRYPOINT" {
+			CURRENT_MAP.player.x = i.X
+			CURRENT_MAP.player.y = i.Y
+		}
+	}
 }
 
-func (dung *gameMap) spawnPawnAtRandomPosition(name string, count int) {
+func (dung *gameMap) spawnFurniture(l *generator2.Level) {
+	// check if generated map has an entry point
+	for _, i := range l.Items {
+		if i.Name == "TORCH" {
+			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TORCH, x: i.X, y: i.Y})
+		}
+	}
 }
 
-func (dung *gameMap) spawnItemAtRandomPosition(name string, count int) {
+func (dung *gameMap) spawnEnemiesAtRoutes(l *generator2.Level) {
+	for _, r := range l.Routes {
+		if len(r.Waypoints) > 0 {
+			dung.pawns = append(dung.pawns, &pawn{
+				ccell: &consoleCell{
+					appearance: 'G',
+					color:      cw.RED,
+					inverse:    false,
+				},
+				hp:            0,
+				maxhp:         0,
+				x:             r.Waypoints[0].X,
+				y:             r.Waypoints[0].Y,
+				nextTurnToAct: 0,
+				sightRange:    6,
+				name:          "Guard",
+				ai:            &aiData{},
+			})
+		}
+	}
 }
