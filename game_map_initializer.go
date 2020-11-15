@@ -4,18 +4,6 @@ import (
 	generator2 "parcelcreationtool/generator"
 )
 
-var testMap = []string{
-	"########################",
-	"#......#...............#",
-	"#......#...............#",
-	"#......#...............#",
-	"#......#.......#######+#",
-	"###+####.......#.......#",
-	"#..............#.......#",
-	"#..............#.......#",
-	"########################",
-}
-
 func (dung *gameMap) initialize_level() { //crap of course
 	dung.pawns = make([]*pawn, 0)
 }
@@ -75,12 +63,20 @@ func (dung *gameMap) applyRuneMap(generated_map *[]string) {
 
 func (dung *gameMap) spawnPlayer(l *generator2.Level) {
 	CURRENT_MAP.player = initNewPawn(PAWN_PLAYER, 1, 1, false)
+	CURRENT_MAP.player.inv = &inventory{}
+	CURRENT_MAP.player.inv.init()
 	// check if generated map has an entry point
+	// and select one at random
+	entrypoints := make([][2]int, 0)
 	for _, i := range l.Items {
 		if i.Name == "ENTRYPOINT" {
-			CURRENT_MAP.player.x = i.X
-			CURRENT_MAP.player.y = i.Y
+			entrypoints = append(entrypoints, [2]int{i.X, i.Y})
 		}
+	}
+	if len(entrypoints) > 0 {
+		randEntryIndex := rnd.Rand(len(entrypoints))
+		CURRENT_MAP.player.x = entrypoints[randEntryIndex][0]
+		CURRENT_MAP.player.y = entrypoints[randEntryIndex][1]
 	}
 }
 
