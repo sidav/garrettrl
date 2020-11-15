@@ -74,13 +74,7 @@ func (dung *gameMap) applyRuneMap(generated_map *[]string) {
 }
 
 func (dung *gameMap) spawnPlayer(l *generator2.Level) {
-	CURRENT_MAP.player = &pawn{
-		code: PAWN_PLAYER,
-		hp:             3,
-		x:              1,
-		y:              1,
-		nextTurnToAct:  0,
-	}
+	CURRENT_MAP.player = initNewPawn(PAWN_PLAYER, 1, 1, false)
 	// check if generated map has an entry point
 	for _, i := range l.Items {
 		if i.Name == "ENTRYPOINT" {
@@ -103,17 +97,10 @@ func (dung *gameMap) spawnEnemiesAtRoutes(l *generator2.Level) {
 	for r_index := range l.Routes {
 		r := l.Routes[r_index]
 		if len(r.Waypoints) > 0 {
-			newEnemy := pawn{
-				code: PAWN_GUARD,
-				hp:                0,
-				x:                 r.Waypoints[0].X,
-				y:                 r.Waypoints[0].Y,
-				nextTurnToAct:     0,
-				ai:                &aiData{},
-			}
+			newEnemy := initNewPawn(PAWN_GUARD, r.Waypoints[0].X, r.Waypoints[0].Y, true)
 			newEnemy.ai.route = &r
 			newEnemy.ai.currentState = AI_PATROLLING
-			dung.pawns = append(dung.pawns, &newEnemy)
+			dung.pawns = append(dung.pawns, newEnemy)
 		}
 	}
 }
@@ -125,13 +112,7 @@ func (dung *gameMap) spawnRoamingEnemies(count int) {
 		for !dung.isTilePassableAndNotOccupied(x, y) {
 			x, y = rnd.Rand(w), rnd.Rand(h)
 		}
-		dung.pawns = append(dung.pawns, &pawn{
-			code: PAWN_GUARD,
-			hp:                0,
-			x:                 x,
-			y:                 y,
-			nextTurnToAct:     0,
-			ai:                &aiData{},
-		})
+		newEnemy := initNewPawn(PAWN_GUARD, x, y, true)
+		dung.pawns = append(dung.pawns, newEnemy)
 	}
 }

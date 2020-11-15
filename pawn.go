@@ -11,6 +11,23 @@ type (
 	}
 )
 
+func initNewPawn(code pawnCode, x, y int, hasAi bool) *pawn {
+	newPawn := &pawn{
+		code:          code,
+		hp:            0,
+		x:             x,
+		y:             y,
+		nextTurnToAct: 0,
+		ai:            nil,
+		isRunning:     false,
+	}
+	newPawn.hp = newPawn.getStaticData().maxhp
+	if hasAi {
+		newPawn.ai = &aiData{}
+	}
+	return newPawn
+}
+
 func (p *pawn) isDead() bool {
 	return p.hp <= 0
 }

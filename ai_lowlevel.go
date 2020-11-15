@@ -18,19 +18,17 @@ func (p *pawn) ai_timeoutState() {
 	}
 }
 
-//func (p *pawn) ai_raiseAlarmLevel() {
-//	newState := p.ai.currentState
-//	switch p.ai.currentState {
-//	case AI_ROAM, AI_PATROLLING:
-//		newState = AI_SEARCHING
-//	case AI_SEARCHING:
-//		newState = AI_ALERTED
-//	}
-//	p.ai.currentState = newState
-//}
-
 func (p *pawn) ai_isCalm() bool {
 	return p.ai.currentState == AI_PATROLLING || p.ai.currentState == AI_ROAM
+}
+
+func (p *pawn) ai_hitAnotherPawn(t *pawn) {
+	if (p.x-t.x)*(p.x-t.x) + (p.y-t.y)*(p.y-t.y) <= 2 {
+		t.hp--
+		p.spendTurnsForAction(15)
+	} else {
+		panic("Non-adjacent pawn attacked!")
+	}
 }
 
 func (p *pawn) ai_canSeePlayer() bool {
@@ -60,7 +58,11 @@ func (p *pawn) ai_TryMoveOrOpenDoorOrAlert(dirx, diry int) bool {
 		pawnAt := CURRENT_MAP.getPawnAt(newx, newy)
 		if pawnAt == CURRENT_MAP.player {
 			ai.targetPawn = pawnAt
-			ai.currentState = AI_ALERTED
+			if p.ai.currentState == AI_ALERTED {
+				p.ai_hitAnotherPawn(ai.targetPawn)
+			} else {
+				ai.currentState = AI_ALERTED
+			}
 		}
 		if pawnAt == nil {
 			// close the door behind if needed

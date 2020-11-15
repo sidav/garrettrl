@@ -7,12 +7,21 @@ func (d *gameMap) recalculatePathfindingCostMap(considerPawns bool) {
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
 			if d.isTilePassable(x, y) || d.isTileADoor(x, y) {
-				if !considerPawns || d.getPawnAt(x, y) == nil {
-					d.pathfindingCostMap[x][y] = 0
-					continue
-				}
+				d.pathfindingCostMap[x][y] = 0
+			} else {
+				d.pathfindingCostMap[x][y] = -1
 			}
-			d.pathfindingCostMap[x][y] = -1
+		}
+	}
+	if considerPawns {
+		for _, p := range CURRENT_MAP.pawns {
+			d.pathfindingCostMap[p.x][p.y] = -1
+		}
+	}
+	// consider furniture
+	for _, f := range CURRENT_MAP.furnitures {
+		if !f.getStaticData().canBeSteppedOn {
+			d.pathfindingCostMap[f.x][f.y] = -1
 		}
 	}
 }

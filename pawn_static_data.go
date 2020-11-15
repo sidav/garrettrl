@@ -50,7 +50,7 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 		},
 		sightRangeAlerted:     10,
 		name:                  "Taffer",
-		maxhp:                 3,
+		maxhp:                 5,
 		timeForWalking:        10,
 		timeForRunning:        6,
 		runningNoiseIntensity: 5,

@@ -22,6 +22,7 @@ const (
 type furnitureStaticData struct {
 	lightStrength int
 	appearance *consoleCell
+	canBeSteppedOn bool
 }
 
 var furnitureStaticTable = map[furnitureCode] furnitureStaticData {
@@ -40,5 +41,6 @@ var furnitureStaticTable = map[furnitureCode] furnitureStaticData {
 			color:      cw.YELLOW,
 			inverse:    true,
 		},
+		canBeSteppedOn: false,
 	},
 }
