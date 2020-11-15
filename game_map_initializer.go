@@ -76,7 +76,7 @@ func (dung *gameMap) applyRuneMap(generated_map *[]string) {
 func (dung *gameMap) spawnPlayer(l *generator2.Level) {
 	CURRENT_MAP.player = &pawn{
 		code: PAWN_PLAYER,
-		hp:             0,
+		hp:             3,
 		x:              1,
 		y:              1,
 		nextTurnToAct:  0,

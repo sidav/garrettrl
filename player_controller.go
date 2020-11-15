@@ -22,6 +22,12 @@ func (p *playerController) playerControl(d *gameMap) {
 				CURRENT_MAP.player.spendTurnsForAction(10)
 			case "r":
 				CURRENT_MAP.player.isRunning = !CURRENT_MAP.player.isRunning
+			case "n":
+				newNoise := CURRENT_MAP.player.createMovementNoise()
+				newNoise.intensity = 15
+				newNoise.suspicious = true
+				CURRENT_MAP.createNoise(newNoise)
+				log.AppendMessage("*Whistle*")
 			case "ESCAPE":
 				GAME_IS_RUNNING = false
 			case "INSERT":

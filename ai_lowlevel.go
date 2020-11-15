@@ -10,6 +10,17 @@ func (p *pawn) ai_resetStateToCalm() {
 	}
 }
 
+func (p *pawn) ai_raiseAlarmLevel() {
+	newState := p.ai.currentState
+	switch p.ai.currentState {
+	case AI_ROAM, AI_PATROLLING:
+		newState = AI_SEARCHING
+	case AI_SEARCHING:
+		newState = AI_ALERTED
+	}
+	p.ai.currentState = newState
+}
+
 func (p *pawn) ai_isCalm() bool {
 	return p.ai.currentState == AI_PATROLLING || p.ai.currentState == AI_ROAM
 }

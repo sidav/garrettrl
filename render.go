@@ -148,6 +148,9 @@ func renderPawn(p *pawn, inverse bool) {
 		case AI_ALERTED:
 			renderCcellForceChar(p.getStaticData().ccell, x, y, '!')
 			return
+		case AI_SEARCHING:
+			renderCcellForceChar(p.getStaticData().ccell, x, y, '?')
+			return
 		}
 
 	}
