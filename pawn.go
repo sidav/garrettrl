@@ -2,11 +2,9 @@ package main
 
 type (
 	pawn struct {
-		ccell                                      *consoleCell
-		hp, maxhp, x, y, nextTurnToAct int
-		sightRangeCalm, sightRangeAlerted int
-		name                                       string
-		ai *aiData
+		code                              pawnCode
+		hp, x, y, nextTurnToAct    int
+		ai                                *aiData
 	}
 )
 
@@ -27,5 +25,5 @@ func (p *pawn) getCoords() (int, int) {
 }
 
 func (p *pawn) getHpPercent() int {
-	return p.hp * 100 / p.maxhp
+	return p.hp * 100 / p.getStaticData().maxhp
 }

@@ -142,16 +142,16 @@ func renderPawn(p *pawn, inverse bool) {
 	if p.ai != nil {
 		switch p.ai.currentState {
 		case AI_ALERTED:
-			renderCcellForceChar(p.ccell, x, y, '!')
+			renderCcellForceChar(p.getStaticData().ccell, x, y, '!')
 			return
 		}
 
 	}
 	if p == CURRENT_MAP.player && CURRENT_MAP.tiles[p.x][p.y].lightLevel == 0 {
-		renderCcellForceColor(p.ccell, x, y, darkColor)
+		renderCcellForceColor(p.getStaticData().ccell, x, y, darkColor)
 		return
 	}
-	renderCcell(p.ccell, x, y)
+	renderCcell(p.getStaticData().ccell, x, y)
 	cw.SetBgColor(cw.BLACK)
 }
 

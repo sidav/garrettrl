@@ -1,7 +1,6 @@
 package main
 
 import (
-	cw "github.com/sidav/golibrl/console"
 	generator2 "parcelcreationtool/generator"
 )
 
@@ -76,18 +75,11 @@ func (dung *gameMap) applyRuneMap(generated_map *[]string) {
 
 func (dung *gameMap) spawnPlayer(l *generator2.Level) {
 	CURRENT_MAP.player = &pawn{
-		ccell: &consoleCell{
-			appearance: '@',
-			color:      cw.WHITE,
-			inverse:    false,
-		},
+		code: PAWN_PLAYER,
 		hp:             0,
-		maxhp:          0,
 		x:              1,
 		y:              1,
 		nextTurnToAct:  0,
-		sightRangeCalm: 10,
-		name:           "",
 	}
 	// check if generated map has an entry point
 	for _, i := range l.Items {
@@ -112,19 +104,11 @@ func (dung *gameMap) spawnEnemiesAtRoutes(l *generator2.Level) {
 		r := l.Routes[r_index]
 		if len(r.Waypoints) > 0 {
 			newEnemy := pawn{
-				ccell: &consoleCell{
-					appearance: 'G',
-					color:      cw.RED,
-					inverse:    false,
-				},
+				code: PAWN_GUARD,
 				hp:                0,
-				maxhp:             0,
 				x:                 r.Waypoints[0].X,
 				y:                 r.Waypoints[0].Y,
 				nextTurnToAct:     0,
-				sightRangeCalm:    6,
-				sightRangeAlerted: 9,
-				name:              "Guard",
 				ai:                &aiData{},
 			}
 			newEnemy.ai.route = &r
@@ -142,19 +126,11 @@ func (dung *gameMap) spawnRoamingEnemies(count int) {
 			x, y = rnd.Rand(w), rnd.Rand(h)
 		}
 		dung.pawns = append(dung.pawns, &pawn{
-			ccell: &consoleCell{
-				appearance: 'G',
-				color:      cw.RED,
-				inverse:    false,
-			},
+			code: PAWN_GUARD,
 			hp:                0,
-			maxhp:             0,
 			x:                 x,
 			y:                 y,
 			nextTurnToAct:     0,
-			sightRangeCalm:    6,
-			sightRangeAlerted: 9,
-			name:              "Guard",
 			ai:                &aiData{},
 		})
 	}
