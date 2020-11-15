@@ -106,7 +106,8 @@ func (dung *gameMap) spawnEnemiesAtRoutes(l *generator2.Level) {
 }
 
 func (dung *gameMap) spawnRoamingEnemies(count int) {
-	var x, y int
+	x := -1
+	y := -1
 	w, h := dung.getSize()
 	for i := 0; i < count; i++ {
 		for !dung.isTilePassableAndNotOccupied(x, y) {

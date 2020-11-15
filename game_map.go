@@ -60,6 +60,11 @@ func (dung *gameMap) isTilePassable(x, y int) bool {
 	if !areCoordinatesValid(x, y) {
 		return false
 	}
+	for _, f := range CURRENT_MAP.furnitures {
+		if !f.getStaticData().canBeSteppedOn && f.x == x && f.y == y {
+			return false
+		}
+	}
 	return dung.tiles[x][y].isPassable()
 }
 

@@ -110,12 +110,20 @@ func (p *pawn) ai_checkSearching() {
 	if p.ai_canSeePlayer() {
 		p.ai.targetPawn = CURRENT_MAP.player
 		p.ai.currentState = AI_ALERTED
+		p.ai.searchx, p.ai.searchy = CURRENT_MAP.player.getCoords()
 		return
 	}
 }
 
 func (p *pawn) ai_actSearching() {
+	const SEARCH_ROAM_RADIUS = 3
 	ai := p.ai
+	if p.x == ai.searchx && p.y == ai.searchy {
+		for !CURRENT_MAP.isTilePassableAndNotOccupied(ai.searchx, ai.searchy) {
+			ai.searchx, ai.searchy = rnd.RandInRange(p.x-SEARCH_ROAM_RADIUS, p.x+SEARCH_ROAM_RADIUS),
+			rnd.RandInRange(p.y-SEARCH_ROAM_RADIUS, p.y+SEARCH_ROAM_RADIUS)
+		}
+	}
 	path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.searchx, ai.searchy, false)
 	dirx, diry := path.GetNextStepVector()
 	p.ai_TryMoveOrOpenDoorOrAlert(dirx, diry)
