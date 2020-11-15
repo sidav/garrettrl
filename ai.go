@@ -107,23 +107,9 @@ func (p *pawn) ai_checkAlerted() {
 
 func (p *pawn) ai_actAlerted() {
 	ai := p.ai
-	for ai.dirx == 0 && ai.diry == 0 {
-		ai.dirx, ai.diry = rnd.RandomUnitVectorInt()
-	}
-	newx, newy := p.x + ai.dirx, p.y + ai.diry
-	if CURRENT_MAP.isTilePassable(newx, newy) {
-		pawnAt := CURRENT_MAP.getPawnAt(newx, newy)
-		if pawnAt == CURRENT_MAP.player {
-			ai.targetPawn = pawnAt
-			ai.currentState = AI_ALERTED
-		}
-		if pawnAt == nil {
-			CURRENT_MAP.movePawnOrOpenDoorByVector(p, true, ai.dirx, ai.diry)
-		}
-	} else {
-		ai.dirx = 0
-		ai.diry = 0
-	}
+	path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.targetPawn.x, ai.targetPawn.y, false)
+	dirx, diry := path.GetNextStepVector()
+	p.ai_TryMoveOrOpenDoorOrAlert(dirx, diry)
 }
 
 // returns true if action is done

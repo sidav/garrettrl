@@ -3,7 +3,8 @@ package main
 type (
 	pawn struct {
 		ccell                                      *consoleCell
-		hp, maxhp, x, y, nextTurnToAct, sightRange int
+		hp, maxhp, x, y, nextTurnToAct int
+		sightRangeCalm, sightRangeAlerted int
 		name                                       string
 		ai *aiData
 	}

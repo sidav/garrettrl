@@ -114,24 +114,6 @@ func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, v
 	return false
 }
 
-func (dung *gameMap) createCostMapForPathfinding() *[][]int {
-	width, height := len(dung.tiles), len((dung.tiles)[0])
-
-	costmap := make([][]int, width)
-	for j := range costmap {
-		costmap[j] = make([]int, height)
-	}
-	for i := 0; i < width; i++ {
-		for j := 0; j < height; j++ {
-			// TODO: optimize by iterating through pawns separately
-			if !dung.tiles[i][j].isPassable() || dung.getPawnAt(i, j) != nil {
-				costmap[i][j] = -1
-			}
-		}
-	}
-	return &costmap
-}
-
 func (dung *gameMap) isTilePassableAndNotOccupied(x, y int) bool {
 	return dung.isTilePassable(x, y) && !dung.isPawnPresent(x, y)
 }
