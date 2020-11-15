@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	cw "github.com/sidav/golibrl/console"
 )
 
@@ -123,7 +124,7 @@ func renderLevel(d *gameMap, flush bool) {
 	//render player
 	renderPawn(d.player, false)
 
-	// renderPlayerStats(d)
+	renderSidebar()
 	renderLog(false)
 
 	if flush {
@@ -153,6 +154,18 @@ func renderPawn(p *pawn, inverse bool) {
 	}
 	renderCcell(p.getStaticData().ccell, x, y)
 	cw.SetBgColor(cw.BLACK)
+}
+
+func renderSidebar() {
+	psd := CURRENT_MAP.player.getStaticData()
+	p := CURRENT_MAP.player
+	cw.SetFgColor(cw.WHITE)
+	if p.isRunning {
+		cw.PutString(fmt.Sprintf("!! RUNNING !!"), R_VIEWPORT_WIDTH+1, 0)
+	} else {
+		cw.PutString(fmt.Sprintf(".. sneaking .."), R_VIEWPORT_WIDTH+1, 0)
+	}
+	cw.PutString(fmt.Sprintf("Health: %d/%d", CURRENT_MAP.player.hp, psd.maxhp), R_VIEWPORT_WIDTH+1, 1)
 }
 
 //func renderItem(i *i_item) {

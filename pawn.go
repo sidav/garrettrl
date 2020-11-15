@@ -5,6 +5,7 @@ type (
 		code                              pawnCode
 		hp, x, y, nextTurnToAct    int
 		ai                                *aiData
+		isRunning bool
 	}
 )
 

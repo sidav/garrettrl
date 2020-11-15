@@ -8,13 +8,13 @@ const (
 	AI_ROAM aiState = iota
 	AI_PATROLLING
 	AI_ALERTED
-	AI_ENGAGING
+	AI_SEARCHING
 )
 
 type aiData struct {
 	currentState aiState
-	targetPawn *pawn
-	dirx, diry int // for roaming
+	targetPawn   *pawn
+	dirx, diry   int // for roaming
 
 	route                *parcel.Route // for patrol
 	currentWaypointIndex int
@@ -44,23 +44,11 @@ func (p *pawn) ai_act() {
 	}
 }
 
-func (p *pawn) ai_resetStateToCalm() {
-	if p.ai.route != nil {
-		p.ai.currentState = AI_PATROLLING
-	} else {
-		p.ai.currentState = AI_ROAM
-	}
-}
-
 func (p *pawn) ai_checkRoam() {
-	x, y := p.getCoords()
-	px, py := CURRENT_MAP.player.getCoords()
-	if CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
-		if CURRENT_MAP.tiles[px][py].lightLevel > 0 {
-			p.ai.targetPawn = CURRENT_MAP.player
-			p.ai.currentState = AI_ALERTED
-			return
-		}
+	if p.ai_canSeePlayer() {
+		p.ai.targetPawn = CURRENT_MAP.player
+		p.ai.currentState = AI_ALERTED
+		return
 	}
 	p.ai_resetStateToCalm()
 }
@@ -93,14 +81,10 @@ func (p *pawn) ai_actPatrolling() {
 }
 
 func (p *pawn) ai_checkAlerted() {
-	x, y := p.getCoords()
-	px, py := CURRENT_MAP.player.getCoords()
-	if CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
-		if CURRENT_MAP.tiles[px][py].lightLevel > 0 {
-			p.ai.targetPawn = CURRENT_MAP.player
-			p.ai.currentState = AI_ALERTED
-			return
-		}
+	if p.ai_canSeePlayer() {
+		p.ai.targetPawn = CURRENT_MAP.player
+		p.ai.currentState = AI_ALERTED
+		return
 	}
 	p.ai_resetStateToCalm()
 }
@@ -110,22 +94,4 @@ func (p *pawn) ai_actAlerted() {
 	path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.targetPawn.x, ai.targetPawn.y, false)
 	dirx, diry := path.GetNextStepVector()
 	p.ai_TryMoveOrOpenDoorOrAlert(dirx, diry)
-}
-
-// returns true if action is done
-func (p *pawn) ai_TryMoveOrOpenDoorOrAlert(dirx, diry int) bool {
-	ai := p.ai
-	newx, newy := p.x + dirx, p.y + diry
-	if CURRENT_MAP.isTilePassable(newx, newy) {
-		pawnAt := CURRENT_MAP.getPawnAt(newx, newy)
-		if pawnAt == CURRENT_MAP.player {
-			ai.targetPawn = pawnAt
-			ai.currentState = AI_ALERTED
-		}
-		if pawnAt == nil {
-			CURRENT_MAP.movePawnOrOpenDoorByVector(p, true, dirx, diry)
-		}
-		return true
-	}
-	return false
 }

@@ -14,6 +14,8 @@ type pawnStaticData struct {
 	sightRangeCalm, sightRangeAlerted int
 	name                              string
 	maxhp                             int
+
+	timeForWalking, timeForRunning int
 }
 
 func (p *pawn) getStaticData() *pawnStaticData {
@@ -31,6 +33,9 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 		sightRangeCalm:    6,
 		sightRangeAlerted: 9,
 		name:              "Guard",
+		maxhp:             3,
+		timeForWalking:    10,
+		timeForRunning:    8,
 	},
 	PAWN_PLAYER: {
 		ccell: &consoleCell{
@@ -41,5 +46,8 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 		sightRangeCalm:    6,
 		sightRangeAlerted: 9,
 		name:              "Taffer",
+		maxhp:             3,
+		timeForWalking:    10,
+		timeForRunning:    6,
 	},
 }

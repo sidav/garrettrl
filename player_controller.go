@@ -20,6 +20,8 @@ func (p *playerController) playerControl(d *gameMap) {
 			switch key_pressed {
 			case "5":
 				CURRENT_MAP.player.spendTurnsForAction(10)
+			case "r":
+				CURRENT_MAP.player.isRunning = !CURRENT_MAP.player.isRunning
 			case "ESCAPE":
 				GAME_IS_RUNNING = false
 			case "INSERT":

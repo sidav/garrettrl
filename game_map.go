@@ -105,6 +105,11 @@ func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, v
 	x += vx; y += vy
 	if dung.isTilePassable(x, y) {
 		p.x = x; p.y = y
+		if p.isRunning {
+			p.spendTurnsForAction(p.getStaticData().timeForRunning)
+		} else {
+			p.spendTurnsForAction(p.getStaticData().timeForWalking)
+		}
 		return true
 	}
 	if dung.isTileADoor(x, y) && mayOpenDoor {

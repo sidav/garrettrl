@@ -43,7 +43,9 @@ func (g *game) runGame() {
 		CURRENT_MAP.recalculateLights()
 		CURRENT_MAP.currentPlayerVisibilityMap = *CURRENT_MAP.getFieldOfVisionFor(CURRENT_MAP.player)
 		renderLevel(&CURRENT_MAP, true)
-		pc.playerControl(&CURRENT_MAP)
+		if CURRENT_MAP.player.isTimeToAct() {
+			pc.playerControl(&CURRENT_MAP)
+		}
 
 		// check if pawns should be removed
 		for i := 0; i < len(CURRENT_MAP.pawns); i++ {
