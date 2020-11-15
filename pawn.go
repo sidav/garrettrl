@@ -23,6 +23,10 @@ func (p *pawn) isTimeToAct() bool {
 	return p.nextTurnToAct <= CURRENT_TURN
 }
 
+func (p *pawn) isInLight() bool {
+	return CURRENT_MAP.tiles[p.x][p.y].lightLevel > 0
+}
+
 func (p *pawn) getCoords() (int, int) {
 	return p.x, p.y
 }

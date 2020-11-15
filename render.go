@@ -10,7 +10,9 @@ var (
 	R_VIEWPORT_HEIGHT  = 20
 	R_VIEWPORT_CURR_X  = 0
 	R_VIEWPORT_CURR_Y  = 0
-	R_UI_COLOR = cw.DARK_BLUE
+	R_UI_COLOR_LIGHT = cw.DARK_YELLOW
+	R_UI_COLOR_DARK = cw.DARK_BLUE
+	R_UI_COLOR_RUNNING = cw.RED
 	RENDER_DISABLE_LOS bool
 )
 
@@ -39,7 +41,13 @@ func updateBoundsIfNeccessary(force bool) {
 
 func r_renderUiOutline() {
 	w, _ := cw.GetConsoleSize()
-	cw.SetBgColor(R_UI_COLOR)
+	cw.SetBgColor(R_UI_COLOR_DARK)
+	if CURRENT_MAP.player.isInLight() {
+		cw.SetBgColor(R_UI_COLOR_LIGHT)
+	}
+	if CURRENT_MAP.player.isRunning {
+		cw.SetBgColor(R_UI_COLOR_RUNNING)
+	}
 	for x := 0; x < w; x++ {
 		// cw.PutChar(' ', x, 0)
 		cw.PutChar(' ', x, R_VIEWPORT_HEIGHT)
