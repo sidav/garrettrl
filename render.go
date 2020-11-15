@@ -112,6 +112,14 @@ func renderLevel(d *gameMap, flush bool) {
 		}
 	}
 
+	// render furniture
+	for _, furniture := range d.furnitures {
+		if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[furniture.x][furniture.y] {
+			x, y := r_CoordsToViewport(furniture.x, furniture.y)
+			renderCcell(furniture.getStaticData().appearance, x, y)
+		}
+	}
+
 	//render player
 	renderPawn(d.player, false)
 

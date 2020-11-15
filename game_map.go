@@ -7,6 +7,7 @@ import (
 type gameMap struct {
 	player      *pawn
 	currentPlayerVisibilityMap [][]bool
+	pathfindingCostMap [][]int
 	tiles       [][]d_tile
 	pawns       []*pawn
 	furnitures  []*furniture

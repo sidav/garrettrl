@@ -26,6 +26,10 @@ func (dung *gameMap) initTilesArrayForSize(sx, sy int) {
 	for i := range dung.tiles {
 		dung.tiles[i] = make([]d_tile, sy)
 	}
+	dung.pathfindingCostMap = make([][]int, sx)
+	for i := range dung.pathfindingCostMap {
+		dung.pathfindingCostMap[i] = make([]int, sy)
+	}
 }
 
 func (dung *gameMap) generateAndInitMap() {
@@ -135,9 +139,10 @@ func (dung *gameMap) spawnFurniture(l *generator2.Level) {
 }
 
 func (dung *gameMap) spawnEnemiesAtRoutes(l *generator2.Level) {
-	for _, r := range l.Routes {
+	for r_index := range l.Routes {
+		r := l.Routes[r_index]
 		if len(r.Waypoints) > 0 {
-			dung.pawns = append(dung.pawns, &pawn{
+			newEnemy := pawn{
 				ccell: &consoleCell{
 					appearance: 'G',
 					color:      cw.RED,
@@ -151,7 +156,10 @@ func (dung *gameMap) spawnEnemiesAtRoutes(l *generator2.Level) {
 				sightRange:    6,
 				name:          "Guard",
 				ai:            &aiData{},
-			})
+			}
+			newEnemy.ai.route = &r
+			newEnemy.ai.currentState = AI_PATROLLING
+			dung.pawns = append(dung.pawns,&newEnemy)
 		}
 	}
 }
