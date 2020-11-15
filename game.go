@@ -34,6 +34,7 @@ func (g *game) runGame() {
 	log.Init(5)
 	rnd = additive_random.FibRandom{}
 	rnd.InitDefault()
+	updateBoundsIfNeccessary(true)
 
 	GAME_IS_RUNNING = true
 	CURRENT_MAP = gameMap{}
@@ -46,9 +47,10 @@ func (g *game) runGame() {
 
 func (g *game) mainLoop() {
 	CURRENT_MAP.recalculateLights()
-	CURRENT_MAP.cleanupNoises()
 	CURRENT_MAP.currentPlayerVisibilityMap = *CURRENT_MAP.getFieldOfVisionFor(CURRENT_MAP.player)
+
 	renderLevel(&CURRENT_MAP, true)
+
 	if CURRENT_MAP.player.isTimeToAct() {
 		pc.playerControl(&CURRENT_MAP)
 	}
@@ -63,5 +65,6 @@ func (g *game) mainLoop() {
 			}
 		}
 	}
+	CURRENT_MAP.cleanupNoises()
 	CURRENT_TURN++
 }

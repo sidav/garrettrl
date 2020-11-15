@@ -113,13 +113,8 @@ func renderLevel(d *gameMap, flush bool) {
 		}
 	}
 
-	// render furniture
-	for _, furniture := range d.furnitures {
-		if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[furniture.x][furniture.y] {
-			x, y := r_CoordsToViewport(furniture.x, furniture.y)
-			renderCcell(furniture.getStaticData().appearance, x, y)
-		}
-	}
+	//render noises
+	renderNoisesForPlayer()
 
 	//render player
 	renderPawn(d.player, false)
@@ -166,6 +161,19 @@ func renderSidebar() {
 		cw.PutString(fmt.Sprintf(".. sneaking .."), R_VIEWPORT_WIDTH+1, 0)
 	}
 	cw.PutString(fmt.Sprintf("Health: %d/%d", CURRENT_MAP.player.hp, psd.maxhp), R_VIEWPORT_WIDTH+1, 1)
+}
+
+func renderNoisesForPlayer() {
+	log.AppendMessagef("%d noises total", len(CURRENT_MAP.noises))
+	for _, n := range CURRENT_MAP.noises {
+		if !CURRENT_MAP.currentPlayerVisibilityMap[n.x][n.y] || !n.showOnlyNotSeen {
+			// render only those noises in player's vicinity
+			if areCoordinatesInRangeFrom(n.x, n.y, CURRENT_MAP.player.x, CURRENT_MAP.player.y, n.intensity) {
+				x, y := r_CoordsToViewport(n.x, n.y)
+				renderCcell(&n.visual, x, y)
+			}
+		}
+	}
 }
 
 //func renderItem(i *i_item) {
@@ -338,7 +346,7 @@ func renderSidebar() {
 func renderLog(flush bool) {
 	cw.SetFgColor(cw.RED)
 	for i := 0; i < len(log.Last_msgs); i++ {
-		cw.PutString(log.Last_msgs[i].Message, 0, R_VIEWPORT_HEIGHT+i)
+		cw.PutString(log.Last_msgs[i].Message, 0, R_VIEWPORT_HEIGHT+i+1)
 	}
 	if flush {
 		cw.Flush_console()

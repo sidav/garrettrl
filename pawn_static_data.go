@@ -37,8 +37,8 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 		maxhp:                 3,
 		timeForWalking:        10,
 		timeForRunning:        8,
-		runningNoiseIntensity: 8,
-		walkingNoiseIntensity: 6,
+		runningNoiseIntensity: 10,
+		walkingNoiseIntensity: 7,
 	},
 	PAWN_PLAYER: {
 		ccell: &consoleCell{

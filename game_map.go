@@ -129,9 +129,21 @@ func (dung *gameMap) isTilePassableAndNotOccupied(x, y int) bool {
 }
 
 func (dung *gameMap) createNoise(n *noise) {
+	n.turnCreatedAt = CURRENT_TURN
+	n.duration = 9
 	dung.noises = append(dung.noises, n)
 }
 
 func (dung *gameMap) cleanupNoises() {
-	dung.noises = []*noise{}
+	i := 0
+	for _, n := range dung.noises {
+		if n.turnCreatedAt+n.duration >= CURRENT_TURN {
+			dung.noises[i] = n
+			i++
+		}
+	}
+	for j:=i; j<len(dung.noises); j++ {
+		dung.noises[j] = nil
+	}
+	dung.noises = dung.noises[:i]
 }
