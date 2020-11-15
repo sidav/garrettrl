@@ -6,7 +6,7 @@ func (d *gameMap) recalculatePathfindingCostMap(considerPawns bool) {
 	w, h := d.getSize()
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
-			if d.isTilePassable(x, y) {
+			if d.isTilePassable(x, y) || d.isTileADoor(x, y) {
 				if !considerPawns || d.getPawnAt(x, y) == nil {
 					d.pathfindingCostMap[x][y] = 0
 					continue

@@ -37,13 +37,17 @@ func (p *pawn) ai_canSeePlayer() bool {
 func (p *pawn) ai_TryMoveOrOpenDoorOrAlert(dirx, diry int) bool {
 	ai := p.ai
 	newx, newy := p.x+dirx, p.y+diry
-	if CURRENT_MAP.isTilePassable(newx, newy) {
+	if CURRENT_MAP.isTilePassable(newx, newy) || CURRENT_MAP.isTileADoor(newx, newy){
 		pawnAt := CURRENT_MAP.getPawnAt(newx, newy)
 		if pawnAt == CURRENT_MAP.player {
 			ai.targetPawn = pawnAt
 			ai.currentState = AI_ALERTED
 		}
 		if pawnAt == nil {
+			// close the door behind if needed
+			if CURRENT_MAP.isTileADoor(p.x, p.y) && CURRENT_MAP.tiles[p.x][p.y].isOpened {
+				CURRENT_MAP.tiles[p.x][p.y].isOpened = false
+			}
 			CURRENT_MAP.movePawnOrOpenDoorByVector(p, true, dirx, diry)
 		}
 		return true

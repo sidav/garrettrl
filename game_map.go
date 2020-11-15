@@ -114,6 +114,7 @@ func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, v
 	}
 	if dung.isTileADoor(x, y) && mayOpenDoor {
 		dung.tiles[x][y].isOpened = true
+		p.spendTurnsForAction(10)
 		return true
 	}
 	return false
