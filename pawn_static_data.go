@@ -10,13 +10,13 @@ const (
 )
 
 type pawnStaticData struct {
-	ccell                             *consoleCell
-	sightRangeCalm, sightRangeAlerted int
-	name                              string
-	maxhp                             int
+	ccell *consoleCell
+	name  string
+	maxhp int
 
-	timeForWalking, timeForRunning               int
-	runningNoiseIntensity, walkingNoiseIntensity int
+	timeForWalking, timeForRunning                           int
+	runningNoiseIntensity, walkingNoiseIntensity             int
+	sightRangeCalm, sightRangeAlerted, sightRangeAlertedDark int
 }
 
 func (p *pawn) getStaticData() *pawnStaticData {
@@ -31,14 +31,16 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 			color:      console.RED,
 			inverse:    false,
 		},
-		sightRangeCalm:        6,
-		sightRangeAlerted:     9,
 		name:                  "Guard",
 		maxhp:                 3,
 		timeForWalking:        10,
 		timeForRunning:        8,
 		runningNoiseIntensity: 10,
 		walkingNoiseIntensity: 7,
+
+		sightRangeAlerted:     9,
+		sightRangeAlertedDark: 3,
+		sightRangeCalm:        6,
 	},
 	PAWN_PLAYER: {
 		ccell: &consoleCell{
@@ -46,8 +48,7 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 			color:      console.WHITE,
 			inverse:    false,
 		},
-		sightRangeCalm:        6,
-		sightRangeAlerted:     9,
+		sightRangeAlerted:     10,
 		name:                  "Taffer",
 		maxhp:                 3,
 		timeForWalking:        10,

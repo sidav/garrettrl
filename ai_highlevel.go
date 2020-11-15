@@ -12,17 +12,18 @@ const (
 )
 
 type aiData struct {
-	currentState     aiState
-	targetPawn       *pawn
-	targetx, targety int
-	dirx, diry       int // for roaming
+	currentState            aiState
+	currentStateTimeoutTurn int
+	targetPawn              *pawn
+	dirx, diry              int // for roaming
 
 	route                *parcel.Route // for patrol
 	currentWaypointIndex int
+
+	searchx, searchy int // for search
 }
 
 func (p *pawn) ai_checkSituation() {
-	p.ai_checkNoises()
 	switch p.ai.currentState {
 	case AI_ROAM, AI_PATROLLING:
 		p.ai_checkRoam()
@@ -33,6 +34,8 @@ func (p *pawn) ai_checkSituation() {
 	default:
 		log.AppendMessage("No CHECK func for some ai state!")
 	}
+	p.ai_checkNoises()
+	p.ai_timeoutState()
 }
 
 func (p *pawn) ai_act() {
@@ -55,7 +58,8 @@ func (p *pawn) ai_checkNoises() {
 		if areCoordinatesInRangeFrom(p.x, p.y, n.x, n.y, n.intensity) {
 			if n.suspicious {
 				p.ai.currentState = AI_SEARCHING
-				p.ai.targetx, p.ai.targety = n.x, n.y
+				p.ai.currentStateTimeoutTurn = CURRENT_TURN + 25*10
+				p.ai.searchx, p.ai.searchy = n.x, n.y
 			}
 		}
 	}
@@ -112,7 +116,7 @@ func (p *pawn) ai_checkSearching() {
 
 func (p *pawn) ai_actSearching() {
 	ai := p.ai
-	path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.targetx, ai.targety, false)
+	path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.searchx, ai.searchy, false)
 	dirx, diry := path.GetNextStepVector()
 	p.ai_TryMoveOrOpenDoorOrAlert(dirx, diry)
 }
@@ -121,7 +125,11 @@ func (p *pawn) ai_checkAlerted() {
 	if p.ai_canSeePlayer() {
 		p.ai.targetPawn = CURRENT_MAP.player
 		p.ai.currentState = AI_ALERTED
+		p.ai.searchx, p.ai.searchy = CURRENT_MAP.player.getCoords()
 		return
+	} else {
+		p.ai.currentState = AI_SEARCHING
+		p.ai.currentStateTimeoutTurn = CURRENT_TURN+25*10
 	}
 }
 
@@ -132,7 +140,7 @@ func (p *pawn) ai_actAlerted() {
 		path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.targetPawn.x, ai.targetPawn.y, false)
 		dirx, diry = path.GetNextStepVector()
 	} else {
-		path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.targetx, ai.targety, false)
+		path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.searchx, ai.searchy, false)
 		dirx, diry = path.GetNextStepVector()
 	}
 	p.ai_TryMoveOrOpenDoorOrAlert(dirx, diry)
