@@ -40,23 +40,28 @@ func (g *game) runGame() {
 	CURRENT_MAP.generateAndInitMap() // applyRuneMap(&testMap)
 
 	for GAME_IS_RUNNING {
-		CURRENT_MAP.recalculateLights()
-		CURRENT_MAP.currentPlayerVisibilityMap = *CURRENT_MAP.getFieldOfVisionFor(CURRENT_MAP.player)
-		renderLevel(&CURRENT_MAP, true)
-		if CURRENT_MAP.player.isTimeToAct() {
-			pc.playerControl(&CURRENT_MAP)
-		}
+		g.mainLoop()
+	}
+}
 
-		// check if pawns should be removed
-		for i := 0; i < len(CURRENT_MAP.pawns); i++ {
-			if CURRENT_MAP.pawns[i].isTimeToAct() {
-				// ai_act for pawns here
-				if CURRENT_MAP.pawns[i].ai != nil {
-					CURRENT_MAP.pawns[i].ai_checkSituation()
-					CURRENT_MAP.pawns[i].ai_act()
-				}
+func (g *game) mainLoop() {
+	CURRENT_MAP.recalculateLights()
+	CURRENT_MAP.cleanupNoises()
+	CURRENT_MAP.currentPlayerVisibilityMap = *CURRENT_MAP.getFieldOfVisionFor(CURRENT_MAP.player)
+	renderLevel(&CURRENT_MAP, true)
+	if CURRENT_MAP.player.isTimeToAct() {
+		pc.playerControl(&CURRENT_MAP)
+	}
+
+	// check if pawns should be removed
+	for i := 0; i < len(CURRENT_MAP.pawns); i++ {
+		if CURRENT_MAP.pawns[i].isTimeToAct() {
+			// ai_act for pawns here
+			if CURRENT_MAP.pawns[i].ai != nil {
+				CURRENT_MAP.pawns[i].ai_checkSituation()
+				CURRENT_MAP.pawns[i].ai_act()
 			}
 		}
-		CURRENT_TURN++
 	}
+	CURRENT_TURN++
 }

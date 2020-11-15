@@ -16,7 +16,7 @@ var (
 
 const (
 	FogOfWarColor = cw.DARK_GRAY
-	darkColor = cw.DARK_BLUE
+	darkColor = cw.BLUE
 )
 
 func updateBoundsIfNeccessary(force bool) {

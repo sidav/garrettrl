@@ -1,5 +1,7 @@
 package main
 
+import cw "github.com/sidav/golibrl/console"
+
 type (
 	pawn struct {
 		code                              pawnCode
@@ -27,4 +29,24 @@ func (p *pawn) getCoords() (int, int) {
 
 func (p *pawn) getHpPercent() int {
 	return p.hp * 100 / p.getStaticData().maxhp
+}
+
+func (p *pawn) createMovementNoise() *noise {
+	intensity := p.getStaticData().walkingNoiseIntensity
+	if p.isRunning {
+		intensity = p.getStaticData().runningNoiseIntensity
+	}
+	nse := &noise{
+		x:               p.x,
+		y:               p.y,
+		intensity:       intensity,
+		visual:          consoleCell{
+			appearance: p.getStaticData().ccell.appearance,
+			color:      cw.BLUE,
+			inverse:    false,
+		},
+		suspicious:      p.isRunning,
+		showOnlyNotSeen: true,
+	}
+	return nse
 }

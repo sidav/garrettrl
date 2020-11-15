@@ -49,7 +49,7 @@ var tileStaticTable = map[tileCode] tileStaticData {
 		isOpaque:   false,
 		appearance: &consoleCell{
 			appearance: '.',
-			color:      cw.BEIGE,
+			color:      cw.YELLOW,
 			inverse:    false,
 		},
 	},

@@ -5,12 +5,13 @@ import (
 )
 
 type gameMap struct {
-	player      *pawn
+	player                     *pawn
 	currentPlayerVisibilityMap [][]bool
-	pathfindingCostMap [][]int
-	tiles       [][]d_tile
-	pawns       []*pawn
-	furnitures  []*furniture
+	pathfindingCostMap         [][]int
+	tiles                      [][]d_tile
+	pawns                      []*pawn
+	furnitures                 []*furniture
+	noises                     []*noise
 	//items       []*i_item
 	//projectiles []*projectile
 }
@@ -85,7 +86,7 @@ func (dung *gameMap) openDoor(x, y int) {
 
 func (dung *gameMap) visibleLineExists(fx, fy, tx, ty int, ignoreStart bool) bool {
 	line := graphic_primitives.GetLine(fx, fy, tx, ty)
-	for i, l := range (*line) {
+	for i, l := range *line {
 		if i == len(*line)-1 {
 			break
 		}
@@ -102,14 +103,17 @@ func (dung *gameMap) visibleLineExists(fx, fy, tx, ty int, ignoreStart bool) boo
 // true if action has been commited
 func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, vy int) bool {
 	x, y := p.getCoords()
-	x += vx; y += vy
+	x += vx
+	y += vy
 	if dung.isTilePassable(x, y) {
-		p.x = x; p.y = y
+		p.x = x
+		p.y = y
 		if p.isRunning {
 			p.spendTurnsForAction(p.getStaticData().timeForRunning)
 		} else {
 			p.spendTurnsForAction(p.getStaticData().timeForWalking)
 		}
+		dung.createNoise(p.createMovementNoise())
 		return true
 	}
 	if dung.isTileADoor(x, y) && mayOpenDoor {
@@ -122,4 +126,12 @@ func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, v
 
 func (dung *gameMap) isTilePassableAndNotOccupied(x, y int) bool {
 	return dung.isTilePassable(x, y) && !dung.isPawnPresent(x, y)
+}
+
+func (dung *gameMap) createNoise(n *noise) {
+	dung.noises = append(dung.noises, n)
+}
+
+func (dung *gameMap) cleanupNoises() {
+	dung.noises = []*noise{}
 }
