@@ -56,8 +56,12 @@ func (p *pawn) ai_checkRoam() {
 func (p *pawn) ai_actRoam() {
 	ai := p.ai
 	tries := 0
-	for ai.dirx == 0 && ai.diry == 0 || !CURRENT_MAP.isTilePassableAndNotOccupied(p.x + ai.dirx, p.y+ai.diry) || tries < 10 {
-		ai.dirx, ai.diry = rnd.RandomUnitVectorInt()
+	for tries < 10 {
+		if CURRENT_MAP.isTilePassableAndNotOccupied(p.x + ai.dirx, p.y+ai.diry) {
+			break 
+		} else {
+			ai.dirx, ai.diry = rnd.RandomUnitVectorInt()
+		}
 		tries++
 	}
 	if !p.ai_TryMoveOrOpenDoorOrAlert(ai.dirx, ai.diry) {
