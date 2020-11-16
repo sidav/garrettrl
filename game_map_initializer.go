@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	generator2 "parcelcreationtool/generator"
 )
 
@@ -33,7 +34,8 @@ func (dung *gameMap) generateAndInitMap() {
 	}
 	dung.applyRuneMap(&generatedMapString)
 	dung.spawnPlayer(generatedMap)
-	dung.spawnFurniture(generatedMap)
+	dung.spawnFurnitureFromGenerated(generatedMap)
+	dung.addRandomFurniture()
 	dung.spawnEnemiesAtRoutes(generatedMap)
 	dung.spawnRoamingEnemies(5)
 }
@@ -80,12 +82,64 @@ func (dung *gameMap) spawnPlayer(l *generator2.Level) {
 	}
 }
 
-func (dung *gameMap) spawnFurniture(l *generator2.Level) {
+func (dung *gameMap) spawnFurnitureFromGenerated(l *generator2.Level) {
 	// check if generated map has an entry point
 	for _, i := range l.Items {
 		if i.Name == "TORCH" {
 			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TORCH, x: i.X, y: i.Y})
 		}
+		if i.Name == "TABLE" {
+			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TABLE, x: i.X, y: i.Y})
+		}
+		if i.Name == "CABINET" {
+			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_CABINET, x: i.X, y: i.Y})
+		}
+	}
+}
+
+func (dung *gameMap) addRandomFurniture() {
+	w, h := CURRENT_MAP.getSize()
+	// tables
+	const TABLES = 0
+	suitableTableCoords := make([][2]int, 0)
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			// placement rule
+			if dung.isTilePassableAndNotOccupied(x, y) &&
+				dung.getNumberOfTilesOfTypeAround(TILE_WALL, x, y) <= 3 &&
+				dung.getNumberOfTilesOfTypeAround(TILE_FLOOR, x, y) > 2 {
+				suitableTableCoords = append(suitableTableCoords, [2]int{x, y})
+			}
+		}
+	}
+	log.AppendMessage(fmt.Sprintf("Found %d suitable coords.", len(suitableTableCoords)))
+	if len(suitableTableCoords) == 0 {
+		log.AppendMessage("NO TABLE COORDS FOUND")
+		return
+	}
+	currTableNum := 0
+	currTableCoordIndex := rnd.Rand(len(suitableTableCoords))
+	needChangeIndex := true
+	for currTableNum < len(suitableTableCoords) && currTableNum < TABLES {
+		for needChangeIndex {
+			needChangeIndex = false
+			currTableCoordIndex = rnd.Rand(len(suitableTableCoords))
+			for _, f := range dung.furnitures {
+				if f.x == suitableTableCoords[currTableCoordIndex][0] &&
+					f.y == suitableTableCoords[currTableCoordIndex][1] {
+					needChangeIndex = true
+					break
+				}
+			}
+		}
+		dung.furnitures = append(dung.furnitures, &furniture{
+			code: FURNITURE_TABLE,
+			x:    suitableTableCoords[currTableCoordIndex][0],
+			y:    suitableTableCoords[currTableCoordIndex][1],
+			inv:  nil,
+		})
+		currTableNum++
+		needChangeIndex = true
 	}
 }
 

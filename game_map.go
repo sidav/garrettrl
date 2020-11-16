@@ -56,6 +56,18 @@ func (d *gameMap) removePawn(p *pawn) {
 	}
 }
 
+func (d *gameMap) getNumberOfTilesOfTypeAround(ttype tileCode, x, y int) int {
+	number := 0
+	for i := x-1; i <= x+1; i++ {
+		for j := y-1; j <= y+1; j++ {
+			if areCoordinatesValid(i, j) && i != x && j != y && d.tiles[i][j].code == ttype {
+				number++
+			}
+		}
+	}
+	return number
+}
+
 func (dung *gameMap) isTilePassable(x, y int) bool {
 	if !areCoordinatesValid(x, y) {
 		return false
