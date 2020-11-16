@@ -10,7 +10,7 @@ var (
 	R_VIEWPORT_HEIGHT  = 20
 	R_VIEWPORT_CURR_X  = 0
 	R_VIEWPORT_CURR_Y  = 0
-	R_UI_COLOR_LIGHT = cw.DARK_YELLOW
+	R_UI_COLOR_LIGHT = cw.YELLOW
 	R_UI_COLOR_DARK = cw.DARK_BLUE
 	R_UI_COLOR_RUNNING = cw.RED
 	RENDER_DISABLE_LOS bool
@@ -42,7 +42,7 @@ func updateBoundsIfNeccessary(force bool) {
 func r_renderUiOutline() {
 	w, _ := cw.GetConsoleSize()
 	cw.SetBgColor(R_UI_COLOR_DARK)
-	if CURRENT_MAP.player.isInLight() {
+	if CURRENT_MAP.player.isNotConcealed() {
 		cw.SetBgColor(R_UI_COLOR_LIGHT)
 	}
 	if CURRENT_MAP.player.isRunning {
@@ -89,11 +89,11 @@ func renderLevel(d *gameMap, flush bool) {
 				if d.tiles[x][y].lightLevel > 0 || d.tiles[x][y].isOpaque() {
 					renderCcell(cell, vpx, vpy)
 				} else {
-					renderCcellForceColor(cell, vpx, vpy, darkColor)
+					renderCcellForceColor(cell, vpx, vpy, darkColor, false)
 				}
 			} else { // is in fog of war
 				if d.tiles[x][y].wasSeenByPlayer {
-					renderCcellForceColor(cell, vpx, vpy, FogOfWarColor)
+					renderCcellForceColor(cell, vpx, vpy, FogOfWarColor, false)
 				}
 			}
 			cw.SetBgColor(cw.BLACK)
@@ -125,7 +125,9 @@ func renderLevel(d *gameMap, flush bool) {
 	renderNoisesForPlayer()
 
 	//render player
-	renderPawn(d.player, false)
+	furnUnderPlayer := d.getFurnitureAt(d.player.x, d.player.y)
+	inverse := furnUnderPlayer != nil && furnUnderPlayer.getStaticData().canBeUsedAsCover
+	renderPawn(d.player, inverse)
 
 	renderSidebar()
 	renderLog(false)
@@ -154,11 +156,15 @@ func renderPawn(p *pawn, inverse bool) {
 		}
 
 	}
-	if p == CURRENT_MAP.player && CURRENT_MAP.tiles[p.x][p.y].lightLevel == 0 {
-		renderCcellForceColor(p.getStaticData().ccell, x, y, darkColor)
-		return
+	playerColor := CURRENT_MAP.player.getStaticData().ccell.color
+	if p == CURRENT_MAP.player {
+		if CURRENT_MAP.tiles[p.x][p.y].lightLevel == 0 {
+			playerColor = darkColor
+		}
+		renderCcellForceColor(p.getStaticData().ccell, x, y, playerColor, inverse)
+	} else {
+		renderCcell(p.getStaticData().ccell, x, y)
 	}
-	renderCcell(p.getStaticData().ccell, x, y)
 	cw.SetBgColor(cw.BLACK)
 }
 
@@ -172,6 +178,10 @@ func renderSidebar() {
 		cw.PutString(fmt.Sprintf(".. sneaking .."), R_VIEWPORT_WIDTH+1, 0)
 	}
 	cw.PutString(fmt.Sprintf("Health: %d/%d", CURRENT_MAP.player.hp, psd.maxhp), R_VIEWPORT_WIDTH+1, 1)
+	cw.PutString(fmt.Sprintf("Loot: %d", CURRENT_MAP.player.inv.gold), R_VIEWPORT_WIDTH+1, 2)
+	for i, arrow := range p.inv.arrows {
+		cw.PutString(fmt.Sprintf("%s: %d", arrow.name, arrow.amount), R_VIEWPORT_WIDTH+1, 4+i)
+	}
 }
 
 func renderNoisesForPlayer() {
@@ -375,8 +385,8 @@ func renderCcell(cc *consoleCell, x, y int) {
 	cw.PutChar(cc.appearance, x, y)
 }
 
-func renderCcellForceColor(cc *consoleCell, x, y int, color int) {
-	if cc.inverse {
+func renderCcellForceColor(cc *consoleCell, x, y int, color int, forceInverse bool) {
+	if cc.inverse || forceInverse{
 		cw.SetFgColor(cw.BLACK)
 		cw.SetBgColor(color)
 	} else {

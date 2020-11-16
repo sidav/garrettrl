@@ -37,9 +37,9 @@ func (p *pawn) ai_canSeePlayer() bool {
 	if CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
 		usedSightRange := p.getStaticData().sightRangeCalm
 		if p.ai_isCalm() {
-			return CURRENT_MAP.player.isInLight() && geometry.AreCoordsInRange(px, py, x, y, usedSightRange)
+			return CURRENT_MAP.player.isNotConcealed() && geometry.AreCoordsInRange(px, py, x, y, usedSightRange)
 		} else {
-			if CURRENT_MAP.player.isInLight() {
+			if CURRENT_MAP.player.isNotConcealed() {
 				usedSightRange = p.getStaticData().sightRangeAlerted
 			} else {
 				usedSightRange = p.getStaticData().sightRangeAlertedDark

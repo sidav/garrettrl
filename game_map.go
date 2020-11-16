@@ -48,6 +48,16 @@ func (dung *gameMap) getPawnAt(x, y int) *pawn {
 	return nil
 }
 
+func (dung *gameMap) getFurnitureAt(x, y int) *furniture {
+	for i := 0; i < len(dung.furnitures); i++ {
+		px, py := dung.furnitures[i].x, dung.furnitures[i].y
+		if px == x && py == y {
+			return dung.furnitures[i]
+		}
+	}
+	return nil
+}
+
 func (d *gameMap) removePawn(p *pawn) {
 	for i := 0; i < len(d.pawns); i++ {
 		if p == d.pawns[i] {
@@ -122,7 +132,7 @@ func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, v
 	x, y := p.getCoords()
 	x += vx
 	y += vy
-	if dung.isTilePassable(x, y) {
+	if dung.isTilePassableAndNotOccupied(x, y) {
 		p.x = x
 		p.y = y
 		if p.isRunning {
@@ -131,6 +141,14 @@ func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, v
 			p.spendTurnsForAction(p.getStaticData().timeForWalking)
 		}
 		dung.createNoise(p.createMovementNoise())
+		return true
+	}
+	furn := dung.getFurnitureAt(x, y)
+	if furn != nil && furn.getStaticData().canBeUsedAsCover && p == dung.player {
+		p.x = x
+		p.y = y
+		dung.createNoise(p.createMovementNoise())
+		p.spendTurnsForAction(p.getStaticData().timeForWalking)
 		return true
 	}
 	if dung.isTileADoor(x, y) && mayOpenDoor {

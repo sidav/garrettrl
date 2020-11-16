@@ -24,13 +24,15 @@ const (
 	FURNITURE_TORCH
 	FURNITURE_CABINET
 	FURNITURE_TABLE
+	FURNITURE_BUSH
 )
 
 type furnitureStaticData struct {
 	lightStrength int
 	appearance    *consoleCell
 
-	canBeSteppedOn, canBeUsedAsCover bool
+	canBeSteppedOn bool // ONLY AS NON-COVER MOVE!
+	canBeUsedAsCover bool
 }
 
 var furnitureStaticTable = map[furnitureCode]furnitureStaticData{
@@ -68,6 +70,16 @@ var furnitureStaticTable = map[furnitureCode]furnitureStaticData{
 			inverse:    false,
 		},
 		canBeSteppedOn:   false,
+		canBeUsedAsCover: true,
+	},
+	FURNITURE_BUSH: {
+		lightStrength: 0,
+		appearance: &consoleCell{
+			appearance: '*',
+			color:      cw.DARK_GREEN,
+			inverse:    false,
+		},
+		canBeSteppedOn:   true,
 		canBeUsedAsCover: true,
 	},
 }

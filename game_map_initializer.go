@@ -95,6 +95,9 @@ func (dung *gameMap) spawnFurnitureFromGenerated(l *generator2.Level) {
 		if i.Name == "CABINET" {
 			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_CABINET, x: i.X, y: i.Y})
 		}
+		if i.Name == "BUSH" {
+			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_BUSH, x: i.X, y: i.Y})
+		}
 	}
 }
 

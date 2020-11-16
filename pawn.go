@@ -41,8 +41,16 @@ func (p *pawn) isTimeToAct() bool {
 	return p.nextTurnToAct <= CURRENT_TURN
 }
 
-func (p *pawn) isInLight() bool {
-	return CURRENT_MAP.tiles[p.x][p.y].lightLevel > 0
+func (p *pawn) isNotConcealed() bool {
+	concealed := true
+	if CURRENT_MAP.tiles[p.x][p.y].lightLevel > 0 {
+		concealed = false
+	}
+	furnitureAt := CURRENT_MAP.getFurnitureAt(p.x, p.y)
+	if furnitureAt != nil && furnitureAt.getStaticData().canBeUsedAsCover {
+		concealed = true
+	}
+	return !concealed
 }
 
 func (p *pawn) getCoords() (int, int) {
