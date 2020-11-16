@@ -87,7 +87,8 @@ func (dung *gameMap) spawnFurnitureFromGenerated(l *generator2.Level) {
 	// check if generated map has an entry point
 	for _, i := range l.Items {
 		if i.Name == "TORCH" {
-			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TORCH, x: i.X, y: i.Y})
+			newF := furniture{code: FURNITURE_TORCH, x: i.X, y: i.Y, isLit: true}
+			dung.furnitures = append(dung.furnitures, &newF)
 		}
 		if i.Name == "TABLE" {
 			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TABLE, x: i.X, y: i.Y})

@@ -3,13 +3,22 @@ package main
 import cw "github.com/sidav/golibrl/console"
 
 type furniture struct {
-	code furnitureCode
-	x, y int
-	inv  *inventory
+	code  furnitureCode
+	isLit bool
+	x, y  int
+	inv   *inventory
 }
 
 func (f *furniture) canBeLooted() bool {
-	return f.inv != nil 
+	return f.inv != nil
+}
+
+func (f *furniture) getCurrentLightLevel() int {
+	if f.isLit {
+		return f.getStaticData().lightStrength
+	} else {
+		return 0
+	}
 }
 
 func (f *furniture) getStaticData() *furnitureStaticData {
@@ -31,7 +40,8 @@ type furnitureStaticData struct {
 	lightStrength int
 	appearance    *consoleCell
 
-	canBeSteppedOn bool // ONLY AS NON-COVER MOVE!
+	isExtinguishable bool // for torches
+	canBeSteppedOn   bool // ONLY AS NON-COVER MOVE!
 	canBeUsedAsCover bool
 }
 
@@ -52,6 +62,7 @@ var furnitureStaticTable = map[furnitureCode]furnitureStaticData{
 			inverse:    false,
 		},
 		canBeSteppedOn: false,
+		isExtinguishable: true,
 	},
 	FURNITURE_CABINET: {
 		lightStrength: 0,

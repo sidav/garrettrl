@@ -214,6 +214,15 @@ func renderNoisesForPlayer() {
 	}
 }
 
+func renderCursor(cx, cy int, flush bool) {
+	cw.SetFgColor(cw.YELLOW)
+	vx, vy := r_CoordsToViewport(cx, cy)
+	cw.PutChar('X', vx, vy)
+	if flush {
+		cw.Flush_console()
+	}
+}
+
 func renderLog(flush bool) {
 	cw.SetFgColor(cw.RED)
 	for i := 0; i < len(log.Last_msgs); i++ {

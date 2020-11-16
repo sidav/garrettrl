@@ -11,7 +11,7 @@ func (dung *gameMap) recalculateLights() {
 	}
 	// pass through furnitures
 	for _, fur := range dung.furnitures {
-		ls := fur.getStaticData().lightStrength
+		ls := fur.getCurrentLightLevel()
 		if ls > 0 {
 			for x := fur.x - ls; x <= fur.x + ls; x++ {
 				for y := fur.y - ls; y <= fur.y + ls; y++ {

@@ -53,6 +53,19 @@ func (pc *playerController) playerControl(d *gameMap) {
 				break
 			case "c":
 				pc.doCloseDoor()
+			case "f": // fire arrow
+				if p.inv.arrows[pc.currentSelectedArrowIndex].amount > 0 {
+					sx, sy := pc.selectCoords(true)
+					if sx == CURRENT_MAP.player.x && sy == CURRENT_MAP.player.y {
+						log.AppendMessage("Trying to suicide with " + p.inv.arrows[pc.currentSelectedArrowIndex].name + ", huh?" )
+					} else if sx != -1 && sy != -1 {
+						applyArrowEffect(p.inv.arrows[pc.currentSelectedArrowIndex].name, sx, sy)
+						p.inv.arrows[pc.currentSelectedArrowIndex].amount--
+						p.spendTurnsForAction(30)
+					}
+				} else {
+					log.AppendMessage("No such arrow in the quiver.")
+				}
 			case "ESCAPE":
 				GAME_IS_RUNNING = false
 			case "INSERT":
@@ -93,6 +106,30 @@ func (p *playerController) keyToDirection(keyPressed string) (int, int) {
 	default:
 		return 0, 0
 	}
+}
+
+func (pc *playerController) selectCoords(forceVisible bool) (int, int) {
+	sx, sy := CURRENT_MAP.player.getCoords()
+	for {
+		renderLevel(&CURRENT_MAP, false)
+		renderCursor(sx, sy, true)
+		key := console.ReadKey()
+		if key == "ENTER" || key == "f" {
+			if !forceVisible || CURRENT_MAP.currentPlayerVisibilityMap[sx][sy] {
+				break
+			} else {
+				log.AppendMessage("Select visible tile!")
+			}
+		}
+		if key == "ESCAPE" {
+			log.AppendMessage("Fine, then.")
+			return -1, -1
+		}
+		dx, dy := pc.keyToDirection(key)
+		sx += dx
+		sy += dy
+	}
+	return sx, sy
 }
 
 func (pc *playerController) doCloseDoor() {
