@@ -57,7 +57,7 @@ var furnitureStaticTable = map[furnitureCode]furnitureStaticData{
 		lightStrength: 0,
 		appearance: &consoleCell{
 			appearance: '&',
-			color:      cw.DARK_YELLOW,
+			color:      cw.DARK_GRAY,
 			inverse:    false,
 		},
 		canBeSteppedOn: false,
