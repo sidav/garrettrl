@@ -9,6 +9,10 @@ type playerController struct {
 
 func (p *playerController) playerControl(d *gameMap) {
 	// p := d.player
+	if p.checkGameState() {
+		return
+	}
+
 	valid_key_pressed := false
 	movex := 0
 	movey := 0
@@ -32,6 +36,8 @@ func (p *playerController) playerControl(d *gameMap) {
 				GAME_IS_RUNNING = false
 			case "INSERT":
 				RENDER_DISABLE_LOS = !RENDER_DISABLE_LOS
+			case "HOME":
+				CURRENT_MAP.player.inv.gold += 111
 			default:
 				valid_key_pressed = false
 				log.AppendMessagef("Unknown key %s (Wrong keyboard layout?)", key_pressed)
@@ -66,4 +72,24 @@ func (p *playerController) keyToDirection(keyPressed string) (int, int) {
 	default:
 		return 0, 0
 	}
+}
+
+func (p *playerController) checkGameState() bool {
+	plr := CURRENT_MAP.player
+	if plr.hp <= 0 {
+		GAME_IS_RUNNING = false
+		gameover()
+		return true
+	}
+	w, h := CURRENT_MAP.getSize()
+	if plr.x == 0 || plr.x == w-1 || plr.y == 0 || plr.y == h-1 {
+		if plr.inv.gold >= 1000 {
+			GAME_IS_RUNNING = false
+			gamewon()
+			return true
+		} else {
+			log.AppendMessage("You need to collect at least 1000 gold before exfiltration!")
+		}
+	}
+	return false
 }

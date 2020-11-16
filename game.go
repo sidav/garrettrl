@@ -1,6 +1,7 @@
 package main
 
 import (
+	cw "github.com/sidav/golibrl/console"
 	"github.com/sidav/golibrl/random/additive_random"
 	log2 "gorltemplate/game_log"
 )
@@ -67,4 +68,22 @@ func (g *game) mainLoop() {
 	}
 	CURRENT_MAP.cleanupNoises()
 	CURRENT_TURN++
+}
+
+func gameover() {
+	cw.Clear_console()
+	cw.PutString("You are dead! Press ENTER to exit.", 0, 0)
+	cw.Flush_console()
+	for cw.ReadKey() != "ENTER" {
+
+	}
+}
+
+func gamewon() {
+	cw.Clear_console()
+	cw.PutString("You won! Press ENTER to exit.", 0, 0)
+	cw.Flush_console()
+	for cw.ReadKey() != "ENTER" {
+
+	}
 }
