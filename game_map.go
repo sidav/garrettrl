@@ -68,8 +68,8 @@ func (d *gameMap) removePawn(p *pawn) {
 
 func (d *gameMap) getNumberOfTilesOfTypeAround(ttype tileCode, x, y int) int {
 	number := 0
-	for i := x-1; i <= x+1; i++ {
-		for j := y-1; j <= y+1; j++ {
+	for i := x - 1; i <= x+1; i++ {
+		for j := y - 1; j <= y+1; j++ {
 			if areCoordinatesValid(i, j) && i != x && j != y && d.tiles[i][j].code == ttype {
 				number++
 			}
@@ -144,12 +144,21 @@ func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, v
 		return true
 	}
 	furn := dung.getFurnitureAt(x, y)
-	if furn != nil && furn.getStaticData().canBeUsedAsCover && p == dung.player {
-		p.x = x
-		p.y = y
-		dung.createNoise(p.createMovementNoise())
-		p.spendTurnsForAction(p.getStaticData().timeForWalking)
-		return true
+	if furn != nil {
+		if furn.getStaticData().canBeUsedAsCover && p == dung.player {
+			p.x = x
+			p.y = y
+			dung.createNoise(p.createMovementNoise())
+			p.spendTurnsForAction(p.getStaticData().timeForWalking)
+			return true
+		}
+		if furn.canBeLooted() && p == dung.player {
+			p.inv.grabEverythingFromInventory(furn.inv)
+			furn.inv = nil
+			// create noise?
+			p.spendTurnsForAction(20)
+			return true
+		}
 	}
 	if dung.isTileADoor(x, y) && mayOpenDoor {
 		dung.tiles[x][y].isOpened = true
@@ -177,7 +186,7 @@ func (dung *gameMap) cleanupNoises() {
 			i++
 		}
 	}
-	for j:=i; j<len(dung.noises); j++ {
+	for j := i; j < len(dung.noises); j++ {
 		dung.noises[j] = nil
 	}
 	dung.noises = dung.noises[:i]
