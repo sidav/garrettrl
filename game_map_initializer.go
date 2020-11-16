@@ -38,6 +38,7 @@ func (dung *gameMap) generateAndInitMap() {
 	dung.addRandomFurniture()
 	dung.spawnEnemiesAtRoutes(generatedMap)
 	dung.spawnRoamingEnemies(5)
+	dung.distributeLootBetweenCabinets(1000)
 }
 
 func (dung *gameMap) applyRuneMap(generated_map *[]string) {
@@ -165,5 +166,27 @@ func (dung *gameMap) spawnRoamingEnemies(count int) {
 		}
 		newEnemy := initNewPawn(PAWN_GUARD, x, y, true)
 		dung.pawns = append(dung.pawns, newEnemy)
+	}
+}
+
+func (d *gameMap) distributeLootBetweenCabinets(minimumGoldAmount int) {
+	totalCabinetsOnMap := 0
+	for _, f := range d.furnitures {
+		if f.code == FURNITURE_CABINET {
+			totalCabinetsOnMap++
+		}
+	}
+	avgGoldPerCabinet := minimumGoldAmount/totalCabinetsOnMap
+	minGoldPerCabinet := avgGoldPerCabinet - 25
+	if minGoldPerCabinet < 0 {
+		minGoldPerCabinet = 0
+	}
+	maxGoldPerCabinet := avgGoldPerCabinet + 75
+	for _, f := range d.furnitures {
+		if f.code == FURNITURE_CABINET {
+			f.inv = &inventory{}
+			f.inv.init()
+			f.inv.gold = rnd.RandInRange(minGoldPerCabinet, maxGoldPerCabinet)
+		}
 	}
 }
