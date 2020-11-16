@@ -5,11 +5,12 @@ import (
 )
 
 type playerController struct {
+	currentSelectedArrowIndex int
 }
 
-func (p *playerController) playerControl(d *gameMap) {
-	// p := d.player
-	if p.checkGameState() {
+func (pc *playerController) playerControl(d *gameMap) {
+	p := d.player
+	if pc.checkGameState() {
 		return
 	}
 
@@ -19,20 +20,37 @@ func (p *playerController) playerControl(d *gameMap) {
 	for !valid_key_pressed {
 		key_pressed := console.ReadKey()
 		valid_key_pressed = true
-		movex, movey = p.keyToDirection(key_pressed)
+		movex, movey = pc.keyToDirection(key_pressed)
 		if movex == 0 && movey == 0 {
 			switch key_pressed {
 			case "5":
-				CURRENT_MAP.player.spendTurnsForAction(10)
+				p.spendTurnsForAction(10)
 			case "r":
-				CURRENT_MAP.player.isRunning = !CURRENT_MAP.player.isRunning
+				p.isRunning = !p.isRunning
 			case "n":
-				newNoise := CURRENT_MAP.player.createMovementNoise()
+				newNoise := p.createMovementNoise()
 				newNoise.intensity = 15
 				newNoise.suspicious = true
 				CURRENT_MAP.createNoise(newNoise)
 				log.AppendMessage("*Whistle*")
-				CURRENT_MAP.player.spendTurnsForAction(10)
+				p.spendTurnsForAction(10)
+			case "a": // select next arrow 
+				initialArrowIndex := pc.currentSelectedArrowIndex
+				pc.currentSelectedArrowIndex++
+				for {
+					if pc.currentSelectedArrowIndex >= len(p.inv.arrows) {
+						pc.currentSelectedArrowIndex = 0
+					}
+					if pc.currentSelectedArrowIndex == initialArrowIndex {
+						break
+					}
+					if p.inv.arrows[pc.currentSelectedArrowIndex].amount == 0 {
+						pc.currentSelectedArrowIndex++
+					} else {
+						break
+					}
+				}
+				break
 			case "c":
 				pc.doCloseDoor()
 			case "ESCAPE":
@@ -40,7 +58,7 @@ func (p *playerController) playerControl(d *gameMap) {
 			case "INSERT":
 				RENDER_DISABLE_LOS = !RENDER_DISABLE_LOS
 			case "HOME":
-				CURRENT_MAP.player.inv.gold += 111
+				p.inv.gold += 111
 			default:
 				valid_key_pressed = false
 				log.AppendMessagef("Unknown key %s (Wrong keyboard layout?)", key_pressed)
@@ -50,19 +68,19 @@ func (p *playerController) playerControl(d *gameMap) {
 	}
 	// move player's pawn here and something
 	if movex != 0 || movey != 0 {
-		CURRENT_MAP.movePawnOrOpenDoorByVector(CURRENT_MAP.player, true, movex, movey)
+		CURRENT_MAP.movePawnOrOpenDoorByVector(p, true, movex, movey)
 	}
 }
 
 func (p *playerController) keyToDirection(keyPressed string) (int, int) {
 	switch keyPressed {
-	case "s", "2":
+	case "2":
 		return 0, 1
-	case "w", "8":
+	case "8":
 		return 0, -1
-	case "a", "4":
+	case "4":
 		return -1, 0
-	case "d", "6":
+	case "6":
 		return 1, 0
 	case "7":
 		return -1, -1

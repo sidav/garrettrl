@@ -178,7 +178,11 @@ func renderSidebar() {
 	cw.PutString(fmt.Sprintf("Health: %d/%d", CURRENT_MAP.player.hp, psd.maxhp), R_VIEWPORT_WIDTH+1, 1)
 	cw.PutString(fmt.Sprintf("Loot: %d", CURRENT_MAP.player.inv.gold), R_VIEWPORT_WIDTH+1, 2)
 	for i, arrow := range p.inv.arrows {
+		if currPlayerController.currentSelectedArrowIndex == i {
+			cw.SetColor(cw.BLACK, cw.WHITE)
+		}
 		cw.PutString(fmt.Sprintf("%s: %d", arrow.name, arrow.amount), R_VIEWPORT_WIDTH+1, 4+i)
+		cw.SetColor(cw.WHITE, cw.BLACK)
 	}
 }
 

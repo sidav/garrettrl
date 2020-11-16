@@ -13,9 +13,10 @@ type arrow struct {
 func (i *inventory) init() {
 	i.gold = 0
 	i.arrows = []arrow{
-		{name: "Water arrow", amount: 3},
-		{name: "Gas arrow", amount: 2},
+		{name: "Water arrow", amount: 1},
+		{name: "Gas arrow", amount: 1},
 		{name: "Explosive arrow", amount: 1},
+		{name: "Noise arrow", amount: 1},
 	}
 }
 

@@ -11,12 +11,12 @@ var (
 )
 
 var (
-	GAME_IS_RUNNING bool
-	log             log2.GameLog
-	rnd 			additive_random.FibRandom
-	pc 				playerController
-	CURRENT_TURN    int
-	CURRENT_MAP 	gameMap
+	GAME_IS_RUNNING      bool
+	log                  log2.GameLog
+	rnd                  additive_random.FibRandom
+	currPlayerController playerController
+	CURRENT_TURN         int
+	CURRENT_MAP          gameMap
 )
 
 type game struct {
@@ -27,7 +27,7 @@ func areCoordinatesValid(x, y int) bool {
 }
 
 func areCoordinatesInRangeFrom(fx, fy, tx, ty, srange int) bool {
-	return (tx-fx)*(tx-fx) + (ty-fy)*(ty-fy) < srange * srange 
+	return (tx-fx)*(tx-fx)+(ty-fy)*(ty-fy) < srange*srange
 }
 
 func (g *game) runGame() {
@@ -50,10 +50,9 @@ func (g *game) mainLoop() {
 	CURRENT_MAP.recalculateLights()
 	CURRENT_MAP.currentPlayerVisibilityMap = *CURRENT_MAP.getFieldOfVisionFor(CURRENT_MAP.player)
 
-	renderLevel(&CURRENT_MAP, true)
-
-	if CURRENT_MAP.player.isTimeToAct() {
-		pc.playerControl(&CURRENT_MAP)
+	for GAME_IS_RUNNING && CURRENT_MAP.player.isTimeToAct() {
+		renderLevel(&CURRENT_MAP, true)
+		currPlayerController.playerControl(&CURRENT_MAP)
 	}
 
 	// check if pawns should be removed
