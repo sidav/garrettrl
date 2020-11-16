@@ -190,8 +190,15 @@ func renderNoisesForPlayer() {
 			if areCoordinatesInRangeFrom(n.x, n.y, CURRENT_MAP.player.x, CURRENT_MAP.player.y, n.intensity) {
 				if n.textBubble != "" {
 					x, y := r_CoordsToViewport(n.x, n.y)
+					if n.creator != nil {
+						x, y = r_CoordsToViewport(n.creator.getCoords())
+					}
 					x -= len(n.textBubble)/2
-					cw.SetColor(cw.BEIGE, cw.DARK_GRAY)
+					if n.suspicious {
+						cw.SetColor(cw.RED, cw.DARK_GRAY)
+					} else {
+						cw.SetColor(cw.BEIGE, cw.DARK_GRAY)
+					}
 					cw.PutString(n.textBubble, x, y+1)
 					cw.SetBgColor(cw.BLACK)
 				} else {

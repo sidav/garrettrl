@@ -74,6 +74,7 @@ func (p *pawn) ai_checkRoam() {
 	if p.ai_canSeePlayer() {
 		p.ai.targetPawn = CURRENT_MAP.player
 		p.ai.currentState = AI_SEARCHING
+		p.ai.searchx, p.ai.searchy = CURRENT_MAP.player.getCoords()
 		textbubble := p.getStaticData().getRandomResponseTo(SITUATION_ENEMY_SIGHTED)
 		p.doTextbubbleNoise(textbubble, 7, true, false)
 		return
