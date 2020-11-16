@@ -191,6 +191,18 @@ func (d *gameMap) distributeLootBetweenCabinets(minimumGoldAmount int) {
 			f.inv = &inventory{}
 			f.inv.init()
 			f.inv.gold = rnd.RandInRange(minGoldPerCabinet, maxGoldPerCabinet)
+			if rnd.OneChanceFrom(2) {
+				f.inv.arrows[0].amount = 1
+			}
+			if rnd.OneChanceFrom(5) {
+				f.inv.arrows[1].amount = 1
+			}
+			if rnd.OneChanceFrom(10) {
+				f.inv.arrows[2].amount = 1
+			}
+			if rnd.OneChanceFrom(4) {
+				f.inv.arrows[3].amount = 1
+			}
 		}
 	}
 }
