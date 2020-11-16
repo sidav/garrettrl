@@ -1,1 +1,4 @@
 .idea/*
+assets/*
+build_win64/*
+*.zip

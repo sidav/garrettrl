@@ -4,11 +4,11 @@ import cw "github.com/sidav/golibrl/console"
 
 type (
 	pawn struct {
-		code                              pawnCode
-		hp, x, y, nextTurnToAct    int
-		ai                                *aiData
-		isRunning bool
-		inv *inventory
+		code                    pawnCode
+		hp, x, y, nextTurnToAct int
+		ai                      *aiData
+		isRunning               bool
+		inv                     *inventory
 	}
 )
 
@@ -67,10 +67,11 @@ func (p *pawn) createMovementNoise() *noise {
 		intensity = p.getStaticData().runningNoiseIntensity
 	}
 	nse := &noise{
-		x:               p.x,
-		y:               p.y,
-		intensity:       intensity,
-		visual:          consoleCell{
+		creator:   p,
+		x:         p.x,
+		y:         p.y,
+		intensity: intensity,
+		visual: consoleCell{
 			appearance: p.getStaticData().ccell.appearance,
 			color:      cw.BLUE,
 			inverse:    false,
@@ -79,4 +80,18 @@ func (p *pawn) createMovementNoise() *noise {
 		showOnlyNotSeen: true,
 	}
 	return nse
+}
+
+func (p *pawn) doTextbubbleNoise(text string, intensity int, suspicious, showOnlyNotSeen bool, ) {
+	n := &noise{
+		creator:         p,
+		x:               p.x,
+		y:               p.y,
+		intensity:       intensity,
+		visual:          consoleCell{},
+		textBubble:      text,
+		suspicious:      suspicious,
+		showOnlyNotSeen: showOnlyNotSeen,
+	}
+	CURRENT_MAP.createNoise(n)
 }

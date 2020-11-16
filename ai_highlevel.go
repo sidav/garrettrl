@@ -55,11 +55,16 @@ func (p *pawn) ai_act() {
 
 func (p *pawn) ai_checkNoises() {
 	for _, n := range CURRENT_MAP.noises {
+		if n.creator == p {
+			continue
+		}
 		if areCoordinatesInRangeFrom(p.x, p.y, n.x, n.y, n.intensity) {
-			if n.suspicious {
+			if n.suspicious && p.ai_isCalm() {
 				p.ai.currentState = AI_SEARCHING
 				p.ai.currentStateTimeoutTurn = CURRENT_TURN + 25*10
 				p.ai.searchx, p.ai.searchy = n.x, n.y
+				textbubble := p.getStaticData().getRandomResponseTo(SITUATION_NOISE)
+				p.doTextbubbleNoise(textbubble, 7, true, false)
 			}
 		}
 	}
@@ -68,7 +73,9 @@ func (p *pawn) ai_checkNoises() {
 func (p *pawn) ai_checkRoam() {
 	if p.ai_canSeePlayer() {
 		p.ai.targetPawn = CURRENT_MAP.player
-		p.ai.currentState = AI_ALERTED
+		p.ai.currentState = AI_SEARCHING
+		textbubble := p.getStaticData().getRandomResponseTo(SITUATION_ENEMY_SIGHTED)
+		p.doTextbubbleNoise(textbubble, 7, true, false)
 		return
 	}
 }
@@ -111,6 +118,8 @@ func (p *pawn) ai_checkSearching() {
 		p.ai.targetPawn = CURRENT_MAP.player
 		p.ai.currentState = AI_ALERTED
 		p.ai.searchx, p.ai.searchy = CURRENT_MAP.player.getCoords()
+		textbubble := p.getStaticData().getRandomResponseTo(SITUATION_ENEMY_SIGHTED)
+		p.doTextbubbleNoise(textbubble, 7, true, false)
 		return
 	}
 }
@@ -138,6 +147,8 @@ func (p *pawn) ai_checkAlerted() {
 	} else {
 		p.ai.currentState = AI_SEARCHING
 		p.ai.currentStateTimeoutTurn = CURRENT_TURN+25*10
+		textbubble := p.getStaticData().getRandomResponseTo(SITUATION_ENEMY_DISAPPEARED)
+		p.doTextbubbleNoise(textbubble, 7, false, false)
 	}
 }
 

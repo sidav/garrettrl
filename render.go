@@ -188,8 +188,16 @@ func renderNoisesForPlayer() {
 		if !CURRENT_MAP.currentPlayerVisibilityMap[n.x][n.y] || !n.showOnlyNotSeen {
 			// render only those noises in player's vicinity
 			if areCoordinatesInRangeFrom(n.x, n.y, CURRENT_MAP.player.x, CURRENT_MAP.player.y, n.intensity) {
-				x, y := r_CoordsToViewport(n.x, n.y)
-				renderCcell(&n.visual, x, y)
+				if n.textBubble != "" {
+					x, y := r_CoordsToViewport(n.x, n.y)
+					x -= len(n.textBubble)/2
+					cw.SetColor(cw.BEIGE, cw.DARK_GRAY)
+					cw.PutString(n.textBubble, x, y+1)
+					cw.SetBgColor(cw.BLACK)
+				} else {
+					x, y := r_CoordsToViewport(n.x, n.y)
+					renderCcell(&n.visual, x, y)
+				}
 			}
 		}
 	}
