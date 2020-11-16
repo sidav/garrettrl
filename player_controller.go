@@ -32,6 +32,9 @@ func (p *playerController) playerControl(d *gameMap) {
 				newNoise.suspicious = true
 				CURRENT_MAP.createNoise(newNoise)
 				log.AppendMessage("*Whistle*")
+				CURRENT_MAP.player.spendTurnsForAction(10)
+			case "c":
+				pc.doCloseDoor()
 			case "ESCAPE":
 				GAME_IS_RUNNING = false
 			case "INSERT":
@@ -71,6 +74,31 @@ func (p *playerController) keyToDirection(keyPressed string) (int, int) {
 		return 1, 1
 	default:
 		return 0, 0
+	}
+}
+
+func (pc *playerController) doCloseDoor() {
+	px, py := CURRENT_MAP.player.getCoords()
+	doorsAround := CURRENT_MAP.getNumberOfTilesOfTypeAround(TILE_DOOR, px, py)
+	if doorsAround == 1 {
+		for x := px-1; x <= px+1; x++ {
+			for y := py-1; y <= py+1; y++{
+				if CURRENT_MAP.isTileADoor(x, y) && CURRENT_MAP.tiles[x][y].isOpened {
+					CURRENT_MAP.tiles[x][y].isOpened = false
+					CURRENT_MAP.player.spendTurnsForAction(10)
+				}
+			}
+		}
+	} else if doorsAround > 1 {
+		log.AppendMessage("Which direction?")
+		renderLog(true)
+		dirx, diry := pc.keyToDirection(console.ReadKey())
+		if dirx != 0 || diry != 0 {
+			if CURRENT_MAP.isTileADoor(px+dirx, py+diry) {
+				CURRENT_MAP.tiles[px+dirx][py+diry].isOpened = false
+				CURRENT_MAP.player.spendTurnsForAction(10)
+			}
+		}
 	}
 }
 
