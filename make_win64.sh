@@ -1,5 +1,7 @@
 rm build_win64/*.exe
 cp -rf assets/ build_win64/
+cp -rf parcels/ build_win64/
+cp -rf templates/ build_win64/
 
 build_datetime=`date '+%Y_%m_%d__%H_%M_%S'`;
 exename="TaffeRL_"$build_datetime".exe"
