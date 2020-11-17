@@ -9,17 +9,18 @@ const (
 	TILE_WALL
 	TILE_FLOOR
 	TILE_DOOR
+	TILE_WINDOW
 )
 
 type tileStaticData struct {
-	isPassable, isOpaque bool
-	appearance *consoleCell
+	blocksMovement, blocksVision bool
+	appearance                   *consoleCell
 }
 
 var tileStaticTable = map[tileCode] tileStaticData {
 	TILE_UNDEFINED: {
-		isPassable: false,
-		isOpaque:   false,
+		blocksMovement: false,
+		blocksVision:   false,
 		appearance: &consoleCell{
 			appearance: '?',
 			color:      cw.MAGENTA,
@@ -27,8 +28,8 @@ var tileStaticTable = map[tileCode] tileStaticData {
 		},
 	},
 	TILE_WALL: {
-		isPassable: false,
-		isOpaque:   true,
+		blocksMovement: false,
+		blocksVision:   true,
 		appearance: &consoleCell{
 			appearance: ' ',
 			color:      cw.DARK_RED,
@@ -36,8 +37,8 @@ var tileStaticTable = map[tileCode] tileStaticData {
 		},
 	},
 	TILE_DOOR: {
-		isPassable: false,
-		isOpaque:   true,
+		blocksMovement: false,
+		blocksVision:   true,
 		appearance: &consoleCell{
 			appearance: '+',
 			color:      cw.DARK_MAGENTA,
@@ -45,11 +46,20 @@ var tileStaticTable = map[tileCode] tileStaticData {
 		},
 	},
 	TILE_FLOOR: {
-		isPassable: true,
-		isOpaque:   false,
+		blocksMovement: true,
+		blocksVision:   false,
 		appearance: &consoleCell{
 			appearance: '.',
 			color:      cw.YELLOW,
+			inverse:    false,
+		},
+	},
+	TILE_WINDOW: {
+		blocksMovement: false,
+		blocksVision:   false,
+		appearance: &consoleCell{
+			appearance: '#',
+			color:      cw.CYAN,
 			inverse:    false,
 		},
 	},
@@ -81,12 +91,12 @@ func (t *d_tile) isPassable() bool {
 	if t.isOpened {
 		return true
 	}
-	return tileStaticTable[t.code].isPassable
+	return tileStaticTable[t.code].blocksMovement
 }
 
 func (t *d_tile) isOpaque() bool {
 	if t.isOpened {
 		return false
 	}
-	return tileStaticTable[t.code].isOpaque
+	return tileStaticTable[t.code].blocksVision
 }

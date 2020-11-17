@@ -57,6 +57,8 @@ func (dung *gameMap) applyRuneMap(generated_map *[]string) {
 				currDungCell.code = TILE_FLOOR
 			case '+':
 				currDungCell.code = TILE_DOOR
+			case '\'':
+				currDungCell.code = TILE_WINDOW
 			default:
 				currDungCell.code = TILE_UNDEFINED
 			}
