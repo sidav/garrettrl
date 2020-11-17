@@ -6,10 +6,18 @@ import (
 
 type playerController struct {
 	currentSelectedArrowIndex int
+	previousHp int
 }
 
 func (pc *playerController) playerControl(d *gameMap) {
 	p := d.player
+	if pc.previousHp > p.hp {
+		for i := pc.previousHp; i >= p.hp; i-- {
+			renderDamageFlash()
+		}
+	}
+	pc.previousHp = p.hp
+	renderLevel(&CURRENT_MAP, true)
 	if pc.checkGameState() {
 		return
 	}

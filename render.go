@@ -186,6 +186,18 @@ func renderSidebar() {
 	}
 }
 
+func renderDamageFlash() {
+	cw.SetBgColor(cw.DARK_RED)
+	w, h := cw.GetConsoleSize()
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			cw.PutChar(' ',x, y)
+		}
+		cw.Flush_console()
+	}
+	cw.SetBgColor(cw.BLACK)
+}
+
 func renderNoisesForPlayer() {
 	// log.AppendMessagef("%d noises total", len(CURRENT_MAP.noises))
 	for _, n := range CURRENT_MAP.noises {
