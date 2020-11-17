@@ -54,6 +54,7 @@ func (pc *playerController) playerControl(d *gameMap) {
 			case "c":
 				pc.doCloseDoor()
 			case "f": // fire arrow
+				log.AppendMessage("Select a target.")
 				if p.inv.arrows[pc.currentSelectedArrowIndex].amount > 0 {
 					sx, sy := pc.selectCoords(true)
 					if sx == CURRENT_MAP.player.x && sy == CURRENT_MAP.player.y {
@@ -61,7 +62,7 @@ func (pc *playerController) playerControl(d *gameMap) {
 					} else if sx != -1 && sy != -1 {
 						applyArrowEffect(p.inv.arrows[pc.currentSelectedArrowIndex].name, sx, sy)
 						p.inv.arrows[pc.currentSelectedArrowIndex].amount--
-						p.spendTurnsForAction(30)
+						p.spendTurnsForAction(10)
 					}
 				} else {
 					log.AppendMessage("No such arrow in the quiver.")

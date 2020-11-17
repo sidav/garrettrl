@@ -187,7 +187,7 @@ func renderSidebar() {
 }
 
 func renderNoisesForPlayer() {
-	log.AppendMessagef("%d noises total", len(CURRENT_MAP.noises))
+	// log.AppendMessagef("%d noises total", len(CURRENT_MAP.noises))
 	for _, n := range CURRENT_MAP.noises {
 		if !CURRENT_MAP.currentPlayerVisibilityMap[n.x][n.y] || !n.showOnlyNotSeen {
 			// render only those noises in player's vicinity
@@ -199,7 +199,11 @@ func renderNoisesForPlayer() {
 					}
 					x -= len(n.textBubble)/2
 					if n.suspicious {
-						cw.SetColor(cw.RED, cw.DARK_GRAY)
+						if n.creator != nil {
+							cw.SetColor(cw.RED, cw.DARK_GRAY)
+						} else {
+							cw.SetColor(cw.YELLOW, cw.DARK_GRAY)
+						}
 					} else {
 						cw.SetColor(cw.BEIGE, cw.DARK_GRAY)
 					}
