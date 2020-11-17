@@ -19,7 +19,7 @@ func (pc *playerController) playerControl(d *gameMap) {
 		}
 	}
 	pc.previousHp = p.hp
-	renderer.renderLevel(&CURRENT_MAP, true)
+	renderer.renderGameScreen(true)
 	if pc.checkGameState() {
 		return
 	}
@@ -82,11 +82,16 @@ func (pc *playerController) playerControl(d *gameMap) {
 			case "INSERT":
 				renderer.RENDER_DISABLE_LOS = !renderer.RENDER_DISABLE_LOS
 			case "HOME":
-				p.inv.gold += 111
+				p.inv.gold += rnd.Rand(44)
+				for a := range p.inv.arrows {
+					p.inv.arrows[a].amount++
+				}
+			case "DELETE":
+				p.hp += rnd.Rand(5)
 			default:
 				valid_key_pressed = false
 				log.AppendMessagef("Unknown key %s (Wrong keyboard layout?)", key_pressed)
-				renderer.renderLevel(d, true)
+				renderer.renderGameScreen(true)
 			}
 		}
 	}
@@ -122,7 +127,7 @@ func (p *playerController) keyToDirection(keyPressed string) (int, int) {
 func (pc *playerController) selectCoords(forceVisible bool) (int, int) {
 	sx, sy := CURRENT_MAP.player.getCoords()
 	for {
-		renderer.renderLevel(&CURRENT_MAP, false)
+		renderer.renderGameScreen(false)
 		renderer.renderCursor(sx, sy, true)
 		key := console.ReadKey()
 		if key == "ENTER" || key == "f" {

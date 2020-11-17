@@ -52,7 +52,7 @@ func (g *game) mainLoop() {
 	CURRENT_MAP.currentPlayerVisibilityMap = *CURRENT_MAP.getFieldOfVisionFor(CURRENT_MAP.player)
 
 	for GAME_IS_RUNNING && CURRENT_MAP.player.isTimeToAct() {
-		renderer.renderLevel(&CURRENT_MAP, true)
+		renderer.renderGameScreen(true)
 		currPlayerController.playerControl(&CURRENT_MAP)
 	}
 
@@ -61,7 +61,6 @@ func (g *game) mainLoop() {
 		if CURRENT_MAP.pawns[i].isTimeToAct() {
 			// ai_act for pawns here
 			if CURRENT_MAP.pawns[i].ai != nil {
-				CURRENT_MAP.pawns[i].ai_checkSituation()
 				CURRENT_MAP.pawns[i].ai_act()
 			}
 		}

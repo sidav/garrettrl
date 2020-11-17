@@ -12,7 +12,9 @@ const (
 
 const (
 	SITUATION_NOISE responseSituation = iota
+	SITUATION_IDLE_CHATTER
 	SITUATION_ENEMY_SIGHTED
+	SITUATION_STARTING_PURSUIT
 	SITUATION_ENEMY_DISAPPEARED
 	SITUATION_SEARCH_STOPPED
 )
@@ -57,12 +59,28 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 		sightRangeAlertedDark: 3,
 		sightRangeCalm:        6,
 		responsesForSituations: map[responseSituation][]string{
+			SITUATION_IDLE_CHATTER: {
+				"Sometimes I dream of better job...",
+				"* ACHOO!* ",
+				"I'm so sleepy...",
+				"* Yawn *",
+				"* Yawn *", // duplicate intended.
+				"I would have a beer or two...",
+				"Such a boring night.",
+				"When will my watch end?..",
+				"Think I have to sharpen my sword.",
+			},
 			SITUATION_NOISE: {
 				"What was that?",
 				"Huh?",
 				"Did you hear that?",
 			},
 			SITUATION_ENEMY_SIGHTED: {
+				"Is someone there?",
+				"Hey, stop, you taffer!",
+				"I just saw something...",
+			},
+			SITUATION_STARTING_PURSUIT: {
 				"There you are!",
 				"Don't run, taffer!",
 				"Haha! I see ya, thief!",
@@ -71,10 +89,12 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 				"Where did he go?",
 				"I'll find thee, taffer.",
 				"You think you can hide?",
+				"Show yourself!",
 			},
 			SITUATION_SEARCH_STOPPED: {
 				"Nothing.",
 				"Taff it.",
+				"Too much coffee.",
 				"I'll better return.",
 			},
 		},

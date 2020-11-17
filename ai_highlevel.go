@@ -9,6 +9,8 @@ const (
 	AI_PATROLLING
 	AI_SEARCHING
 	AI_ALERTED
+
+	IDLE_CHATTER_FREQUENCY = 70
 )
 
 type aiData struct {
@@ -23,7 +25,12 @@ type aiData struct {
 	searchx, searchy int // for search
 }
 
-func (p *pawn) ai_checkSituation() {
+func (a *aiData) setStateTimeout(duration int) {
+	a.currentStateTimeoutTurn = CURRENT_TURN + duration
+}
+
+func (p *pawn) ai_act() {
+	// first, check situation
 	switch p.ai.currentState {
 	case AI_ROAM, AI_PATROLLING:
 		p.ai_checkRoam()
@@ -35,21 +42,30 @@ func (p *pawn) ai_checkSituation() {
 		log.AppendMessage("No CHECK func for some ai state!")
 	}
 	p.ai_checkNoises()
+	p.ai_produceIdleChatter()
 	p.ai_timeoutState()
+
+	// second, act
+	// SECOND check for time. It is needed.
+	if p.isTimeToAct() {
+		switch p.ai.currentState {
+		case AI_ROAM:
+			p.ai_actRoam()
+		case AI_PATROLLING:
+			p.ai_actPatrolling()
+		case AI_SEARCHING:
+			p.ai_actSearching()
+		case AI_ALERTED:
+			p.ai_actAlerted()
+		default:
+			log.AppendMessage("No ACT func for some ai state!")
+		}
+	}
 }
 
-func (p *pawn) ai_act() {
-	switch p.ai.currentState {
-	case AI_ROAM:
-		p.ai_actRoam()
-	case AI_PATROLLING:
-		p.ai_actPatrolling()
-	case AI_SEARCHING:
-		p.ai_actSearching()
-	case AI_ALERTED:
-		p.ai_actAlerted()
-	default:
-		log.AppendMessage("No ACT func for some ai state!")
+func (p *pawn) ai_produceIdleChatter() {
+	if p.ai_isCalm() && rnd.OneChanceFrom(IDLE_CHATTER_FREQUENCY) {
+		p.doTextbubbleNoise(p.getStaticData().getRandomResponseTo(SITUATION_IDLE_CHATTER), 12, false, false)
 	}
 }
 
@@ -61,7 +77,7 @@ func (p *pawn) ai_checkNoises() {
 		if areCoordinatesInRangeFrom(p.x, p.y, n.x, n.y, n.intensity) {
 			if n.suspicious && p.ai_isCalm() {
 				p.ai.currentState = AI_SEARCHING
-				p.ai.currentStateTimeoutTurn = CURRENT_TURN + 25*10
+				p.ai.setStateTimeout(250)
 				p.ai.searchx, p.ai.searchy = n.x, n.y
 				textbubble := p.getStaticData().getRandomResponseTo(SITUATION_NOISE)
 				p.doTextbubbleNoise(textbubble, 7, true, false)
@@ -74,9 +90,11 @@ func (p *pawn) ai_checkRoam() {
 	if p.ai_canSeePlayer() {
 		p.ai.targetPawn = CURRENT_MAP.player
 		p.ai.currentState = AI_SEARCHING
+		p.ai.setStateTimeout(250)
 		p.ai.searchx, p.ai.searchy = CURRENT_MAP.player.getCoords()
 		textbubble := p.getStaticData().getRandomResponseTo(SITUATION_ENEMY_SIGHTED)
 		p.doTextbubbleNoise(textbubble, 7, true, false)
+		p.spendTurnsForAction(10)
 		return
 	}
 }
@@ -109,9 +127,7 @@ func (p *pawn) ai_actPatrolling() {
 		ai.currentWaypointIndex = 0
 	}
 	currWaypoint = ai.route.Waypoints[ai.currentWaypointIndex]
-	path := CURRENT_MAP.getPathFromTo(p.x, p.y, currWaypoint.X, currWaypoint.Y, false)
-	dirx, diry := path.GetNextStepVector()
-	p.ai_TryMoveOrOpenDoorOrAlert(dirx, diry)
+	p.ai_tryToMoveToCoords(currWaypoint.X, currWaypoint.Y)
 }
 
 func (p *pawn) ai_checkSearching() {
@@ -119,7 +135,7 @@ func (p *pawn) ai_checkSearching() {
 		p.ai.targetPawn = CURRENT_MAP.player
 		p.ai.currentState = AI_ALERTED
 		p.ai.searchx, p.ai.searchy = CURRENT_MAP.player.getCoords()
-		textbubble := p.getStaticData().getRandomResponseTo(SITUATION_ENEMY_SIGHTED)
+		textbubble := p.getStaticData().getRandomResponseTo(SITUATION_STARTING_PURSUIT)
 		p.doTextbubbleNoise(textbubble, 7, true, false)
 		return
 	}
@@ -134,9 +150,7 @@ func (p *pawn) ai_actSearching() {
 			rnd.RandInRange(p.y-SEARCH_ROAM_RADIUS, p.y+SEARCH_ROAM_RADIUS)
 		}
 	}
-	path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.searchx, ai.searchy, false)
-	dirx, diry := path.GetNextStepVector()
-	p.ai_TryMoveOrOpenDoorOrAlert(dirx, diry)
+	p.ai_tryToMoveToCoords(ai.searchx, ai.searchy)
 }
 
 func (p *pawn) ai_checkAlerted() {
@@ -147,7 +161,7 @@ func (p *pawn) ai_checkAlerted() {
 		return
 	} else {
 		p.ai.currentState = AI_SEARCHING
-		p.ai.currentStateTimeoutTurn = CURRENT_TURN+25*10
+		p.ai.setStateTimeout(250)
 		textbubble := p.getStaticData().getRandomResponseTo(SITUATION_ENEMY_DISAPPEARED)
 		p.doTextbubbleNoise(textbubble, 7, false, false)
 	}
@@ -157,9 +171,9 @@ func (p *pawn) ai_actAlerted() {
 	ai := p.ai
 	var dirx, diry int
 	if ai.targetPawn != nil {
-		path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.targetPawn.x, ai.targetPawn.y, false)
-		dirx, diry = path.GetNextStepVector()
+		p.ai_tryToMoveToCoords(ai.targetPawn.x, ai.targetPawn.y)
 	} else {
+		log.Warning("BUG: alerted AI without targetPawn. Please report.")
 		path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.searchx, ai.searchy, false)
 		dirx, diry = path.GetNextStepVector()
 	}

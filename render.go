@@ -80,44 +80,16 @@ func (c *consoleRenderer) updateViewportCoords(p *pawn) {
 	c.R_VIEWPORT_CURR_X = p.x - c.R_VIEWPORT_WIDTH/2
 	c.R_VIEWPORT_CURR_Y = p.y - c.R_VIEWPORT_HEIGHT/2}
 
-func (c *consoleRenderer) renderLevel(d *gameMap, flush bool) {
+func (c *consoleRenderer) renderGameScreen(flush bool) {
 	c.updateBoundsIfNeccessary(false)
 	cw.Clear_console()
-	c.updateViewportCoords(d.player)
+	c.updateViewportCoords(CURRENT_MAP.player)
 	c.renderUiOutline()
-	// render level. vpx, vpy are viewport coords, whereas x, y are real coords.
-	for x := c.R_VIEWPORT_CURR_X; x < c.R_VIEWPORT_CURR_X+c.R_VIEWPORT_WIDTH; x++ {
-		for y := 0; y < c.R_VIEWPORT_CURR_Y+c.R_VIEWPORT_HEIGHT; y++ {
-			vpx, vpy := c.coordsToViewport(x, y)
-			if !areCoordinatesValid(x, y) {
-				continue
-			}
-			cell := d.tiles[x][y].getAppearance()
-			// is seen right now
-			if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
-				d.tiles[x][y].wasSeenByPlayer = true
-				if d.tiles[x][y].lightLevel > 0 || d.tiles[x][y].isOpaque() {
-					c.renderCcell(cell, vpx, vpy)
-				} else {
-					c.renderCcellForceColor(cell, vpx, vpy, c.darkColor, false)
-				}
-			} else { // is in fog of war
-				if d.tiles[x][y].wasSeenByPlayer {
-					c.renderCcellForceColor(cell, vpx, vpy, c.FogOfWarColor, false)
-				}
-			}
-			cw.SetBgColor(cw.BLACK)
-		}
-	}
-	//render items
-	//for _, item := range d.items {
-	//	if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[item.x][item.y] {
-	//		renderItem(item)
-	//	}
-	//}
+
+	c.renderLevel()
 
 	//render pawns
-	for _, pawn := range d.pawns {
+	for _, pawn := range CURRENT_MAP.pawns {
 		if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[pawn.x][pawn.y] {
 			c.renderPawn(pawn, false)
 		}
@@ -130,15 +102,42 @@ func (c *consoleRenderer) renderLevel(d *gameMap, flush bool) {
 	c.renderNoisesForPlayer()
 
 	//render player
-	furnUnderPlayer := d.getFurnitureAt(d.player.x, d.player.y)
+	furnUnderPlayer := CURRENT_MAP.getFurnitureAt(CURRENT_MAP.player.x, CURRENT_MAP.player.y)
 	inverse := furnUnderPlayer != nil && furnUnderPlayer.getStaticData().canBeUsedAsCover
-	c.renderPawn(d.player, inverse)
+	c.renderPawn(CURRENT_MAP.player, inverse)
 
 	c.renderSidebar()
 	c.renderLog(false)
 
 	if flush {
 		cw.Flush_console()
+	}
+}
+
+func (c *consoleRenderer) renderLevel() {
+	// render level. vpx, vpy are viewport coords, whereas x, y are real coords.
+	for x := c.R_VIEWPORT_CURR_X; x < c.R_VIEWPORT_CURR_X+c.R_VIEWPORT_WIDTH; x++ {
+		for y := 0; y < c.R_VIEWPORT_CURR_Y+c.R_VIEWPORT_HEIGHT; y++ {
+			vpx, vpy := c.coordsToViewport(x, y)
+			if !areCoordinatesValid(x, y) {
+				continue
+			}
+			cell := CURRENT_MAP.tiles[x][y].getAppearance()
+			// is seen right now
+			if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
+				CURRENT_MAP.tiles[x][y].wasSeenByPlayer = true
+				if CURRENT_MAP.tiles[x][y].lightLevel > 0 || CURRENT_MAP.tiles[x][y].isOpaque() {
+					c.renderCcell(cell, vpx, vpy)
+				} else {
+					c.renderCcellForceColor(cell, vpx, vpy, c.darkColor, false)
+				}
+			} else { // is in fog of war
+				if CURRENT_MAP.tiles[x][y].wasSeenByPlayer {
+					c.renderCcellForceColor(cell, vpx, vpy, c.FogOfWarColor, false)
+				}
+			}
+			cw.SetBgColor(cw.BLACK)
+		}
 	}
 }
 
@@ -224,6 +223,9 @@ func (c *consoleRenderer) renderNoisesForPlayer() {
 					x, y := c.coordsToViewport(n.x, n.y)
 					if n.creator != nil {
 						x, y = c.coordsToViewport(n.creator.getCoords())
+					}
+					if x == -1 && y == -1 {
+						continue
 					}
 					x -= len(n.textBubble) / 2
 					if n.suspicious {

@@ -2,12 +2,20 @@ package main
 
 import "github.com/sidav/golibrl/astar"
 
+var (
+	pathfindingDepths = [...]int {
+		50,
+		250,
+		5000,
+	}
+)
+
 func (d *gameMap) recalculatePathfindingCostMap(considerPawns bool) {
 	w, h := d.getSize()
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
 			if d.isTilePassable(x, y) || d.isTileADoor(x, y) {
-				d.pathfindingCostMap[x][y] = 0
+				d.pathfindingCostMap[x][y] = 1
 			} else {
 				d.pathfindingCostMap[x][y] = -1
 			}
@@ -15,7 +23,7 @@ func (d *gameMap) recalculatePathfindingCostMap(considerPawns bool) {
 	}
 	if considerPawns {
 		for _, p := range CURRENT_MAP.pawns {
-			d.pathfindingCostMap[p.x][p.y] = -1
+			d.pathfindingCostMap[p.x][p.y] = 25
 		}
 	}
 	// consider furniture
@@ -28,6 +36,22 @@ func (d *gameMap) recalculatePathfindingCostMap(considerPawns bool) {
 
 func (d *gameMap) getPathFromTo(fx, fy, tx, ty int, considerPawns bool) *astar.Cell {
 	d.recalculatePathfindingCostMap(considerPawns)
-	path := astar.FindPath(&d.pathfindingCostMap, fx, fy, tx, ty, true, 100, true, true)
+	var path *astar.Cell
+	for i := range pathfindingDepths {
+		path = astar.FindPath(&d.pathfindingCostMap, fx, fy, tx, ty, true,
+			pathfindingDepths[i], true, true)
+		if checkIfPathLeadsToFinish(path, tx, ty) {
+			log.AppendMessagef("Finished with %d depth", pathfindingDepths[i])
+			break
+		}
+		log.AppendMessage("Increasing depth...")
+	}
 	return path
+}
+
+func checkIfPathLeadsToFinish(p *astar.Cell, fx, fy int) bool {
+	for p.Child != nil {
+		p = p.Child
+	}
+	return p.X == fx && p.Y == fy
 }

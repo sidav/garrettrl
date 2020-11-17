@@ -16,7 +16,7 @@ func (p *pawn) ai_timeoutState() {
 		} else if p.ai.currentState == AI_ALERTED {
 			p.ai.currentState = AI_SEARCHING
 		}
-		p.ai.currentStateTimeoutTurn = CURRENT_TURN+25*10
+		p.ai.setStateTimeout(250)
 	}
 }
 
@@ -25,7 +25,7 @@ func (p *pawn) ai_isCalm() bool {
 }
 
 func (p *pawn) ai_hitAnotherPawn(t *pawn) {
-	if (p.x-t.x)*(p.x-t.x) + (p.y-t.y)*(p.y-t.y) <= 2 {
+	if (p.x-t.x)*(p.x-t.x)+(p.y-t.y)*(p.y-t.y) <= 2 {
 		t.hp--
 		p.spendTurnsForAction(15)
 	} else {
@@ -52,18 +52,25 @@ func (p *pawn) ai_canSeePlayer() bool {
 	return false
 }
 
+func (p *pawn) ai_tryToMoveToCoords(x, y int) {
+	path := CURRENT_MAP.getPathFromTo(p.x, p.y, x, y, true)
+	dirx, diry := path.GetNextStepVector()
+	p.ai_TryMoveOrOpenDoorOrAlert(dirx, diry)
+}
+
 // returns true if action is done
 func (p *pawn) ai_TryMoveOrOpenDoorOrAlert(dirx, diry int) bool {
 	ai := p.ai
 	newx, newy := p.x+dirx, p.y+diry
-	if CURRENT_MAP.isTilePassable(newx, newy) || CURRENT_MAP.isTileADoor(newx, newy){
+	if CURRENT_MAP.isTilePassable(newx, newy) || CURRENT_MAP.isTileADoor(newx, newy) {
 		pawnAt := CURRENT_MAP.getPawnAt(newx, newy)
 		if pawnAt == CURRENT_MAP.player {
 			ai.targetPawn = pawnAt
 			if p.ai.currentState == AI_ALERTED {
 				p.ai_hitAnotherPawn(ai.targetPawn)
 			} else {
-				ai.currentState = AI_ALERTED
+				ai.currentState = AI_SEARCHING
+				ai.setStateTimeout(250)
 			}
 		}
 		if pawnAt == nil {
