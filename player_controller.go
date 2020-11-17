@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/sidav/golibrl/console"
+	"time"
 )
 
 type playerController struct {
@@ -14,6 +15,7 @@ func (pc *playerController) playerControl(d *gameMap) {
 	if pc.previousHp > p.hp {
 		for i := pc.previousHp; i >= p.hp; i-- {
 			renderer.renderDamageFlash()
+			time.Sleep(25 * time.Millisecond)
 		}
 	}
 	pc.previousHp = p.hp

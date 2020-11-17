@@ -209,8 +209,8 @@ func (c *consoleRenderer) renderDamageFlash() {
 		for y := 0; y < h; y++ {
 			cw.PutChar(' ', x, y)
 		}
-		cw.Flush_console()
 	}
+	cw.Flush_console()
 	cw.SetBgColor(cw.BLACK)
 }
 
