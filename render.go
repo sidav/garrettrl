@@ -5,28 +5,39 @@ import (
 	cw "github.com/sidav/golibrl/console"
 )
 
-var (
-	R_VIEWPORT_WIDTH         = 40
-	R_VIEWPORT_HEIGHT        = 20
-	R_VIEWPORT_CURR_X        = 0
-	R_VIEWPORT_CURR_Y        = 0
-	R_UI_COLOR_LIGHT         = cw.YELLOW
-	R_UI_COLOR_DARK          = cw.DARK_BLUE
-	R_UI_COLOR_RUNNING       = cw.RED
-	R_LOOTABLE_CABINET_COLOR = cw.DARK_YELLOW
+type consoleRenderer struct {
+	R_VIEWPORT_WIDTH         int
+	R_VIEWPORT_HEIGHT        int
+	R_VIEWPORT_CURR_X        int
+	R_VIEWPORT_CURR_Y        int
+	R_UI_COLOR_LIGHT         int
+	R_UI_COLOR_DARK          int
+	R_UI_COLOR_RUNNING       int
+	R_LOOTABLE_CABINET_COLOR int
 	RENDER_DISABLE_LOS       bool
-)
+	FogOfWarColor            int
+	darkColor                int
+}
 
-const (
-	FogOfWarColor = cw.DARK_GRAY
-	darkColor     = cw.BLUE
-)
+func (c *consoleRenderer) initDefaults() {
+	c.R_VIEWPORT_WIDTH = 40
+	c.R_VIEWPORT_HEIGHT = 20
+	c.R_VIEWPORT_CURR_X = 0
+	c.R_VIEWPORT_CURR_Y = 0
+	c.R_UI_COLOR_LIGHT = cw.YELLOW
+	c.R_UI_COLOR_DARK = cw.DARK_BLUE
+	c.R_UI_COLOR_RUNNING = cw.RED
+	c.R_LOOTABLE_CABINET_COLOR = cw.DARK_YELLOW
+	c.RENDER_DISABLE_LOS = false
+	c.FogOfWarColor = cw.DARK_GRAY
+	c.darkColor = cw.BLUE
+}
 
-func updateBoundsIfNeccessary(force bool) {
+func (c *consoleRenderer) updateBoundsIfNeccessary(force bool) {
 	if cw.WasResized() || force {
 		cw, ch := cw.GetConsoleSize()
-		R_VIEWPORT_WIDTH = 2 * cw / 3
-		R_VIEWPORT_HEIGHT = ch - len(log.Last_msgs) - 1
+		c.R_VIEWPORT_WIDTH = 2 * cw / 3
+		c.R_VIEWPORT_HEIGHT = ch - len(log.Last_msgs) - 1
 		//SIDEBAR_X = VIEWPORT_W + 1
 		//SIDEBAR_W = cw - VIEWPORT_W - 1
 		//SIDEBAR_H = ch - LOG_HEIGHT
@@ -35,65 +46,64 @@ func updateBoundsIfNeccessary(force bool) {
 	}
 }
 
-//func r_areRealCoordsInViewport(x, y int) bool {
-//	return x - R_VIEWPORT_CURR_X < R_VIEWPORT_WIDTH && y - R_VIEWPORT_CURR_Y < R_VIEWPORT_HEIGHT
+//func c.R_areRealCoordsInViewport(x, y int) bool {
+//	return x - c.R_VIEWPORT_CURR_X < c.R_VIEWPORT_WIDTH && y - c.R_VIEWPORT_CURR_Y < c.R_VIEWPORT_HEIGHT
 //}
 
-func r_renderUiOutline() {
+func (c *consoleRenderer) renderUiOutline() {
 	w, _ := cw.GetConsoleSize()
-	cw.SetBgColor(R_UI_COLOR_DARK)
+	cw.SetBgColor(c.R_UI_COLOR_DARK)
 	if CURRENT_MAP.player.isNotConcealed() {
-		cw.SetBgColor(R_UI_COLOR_LIGHT)
+		cw.SetBgColor(c.R_UI_COLOR_LIGHT)
 	}
 	if CURRENT_MAP.player.isRunning {
-		cw.SetBgColor(R_UI_COLOR_RUNNING)
+		cw.SetBgColor(c.R_UI_COLOR_RUNNING)
 	}
 	for x := 0; x < w; x++ {
 		// cw.PutChar(' ', x, 0)
-		cw.PutChar(' ', x, R_VIEWPORT_HEIGHT)
+		cw.PutChar(' ', x, c.R_VIEWPORT_HEIGHT)
 	}
-	for y := 0; y < R_VIEWPORT_HEIGHT; y++ {
-		cw.PutChar(' ', R_VIEWPORT_WIDTH, y)
+	for y := 0; y < c.R_VIEWPORT_HEIGHT; y++ {
+		cw.PutChar(' ', c.R_VIEWPORT_WIDTH, y)
 	}
 }
 
-func r_CoordsToViewport(x, y int) (int, int) {
-	vpx, vpy := x-R_VIEWPORT_CURR_X, y-R_VIEWPORT_CURR_Y
-	if vpx >= R_VIEWPORT_WIDTH || vpy >= R_VIEWPORT_HEIGHT {
+func (c *consoleRenderer) coordsToViewport(x, y int) (int, int) {
+	vpx, vpy := x-c.R_VIEWPORT_CURR_X, y-c.R_VIEWPORT_CURR_Y
+	if vpx >= c.R_VIEWPORT_WIDTH || vpy >= c.R_VIEWPORT_HEIGHT {
 		return -1, -1
 	}
 	return vpx, vpy
 }
 
-func updateViewportCoords(p *pawn) {
-	R_VIEWPORT_CURR_X = p.x - R_VIEWPORT_WIDTH/2
-	R_VIEWPORT_CURR_Y = p.y - R_VIEWPORT_HEIGHT/2
-}
+func (c *consoleRenderer) updateViewportCoords(p *pawn) {
+	c.R_VIEWPORT_CURR_X = p.x - c.R_VIEWPORT_WIDTH/2
+	c.R_VIEWPORT_CURR_Y = p.y - c.R_VIEWPORT_HEIGHT/2}
 
-func renderLevel(d *gameMap, flush bool) {
-	updateBoundsIfNeccessary(false)
+func (c *consoleRenderer) renderLevel(d *gameMap, flush bool) {
+	c.updateBoundsIfNeccessary(false)
 	cw.Clear_console()
-	updateViewportCoords(d.player)
-	r_renderUiOutline()
+	c.updateViewportCoords(d.player)
+	c.renderUiOutline()
 	// render level. vpx, vpy are viewport coords, whereas x, y are real coords.
-	for x := R_VIEWPORT_CURR_X; x < R_VIEWPORT_CURR_X+R_VIEWPORT_WIDTH; x++ {
-		for y := 0; y < R_VIEWPORT_CURR_Y+R_VIEWPORT_HEIGHT; y++ {
-			vpx, vpy := r_CoordsToViewport(x, y)
+	for x := c.R_VIEWPORT_CURR_X; x < c.R_VIEWPORT_CURR_X+c.R_VIEWPORT_WIDTH; x++ {
+		for y := 0; y < c.R_VIEWPORT_CURR_Y+c.R_VIEWPORT_HEIGHT; y++ {
+			vpx, vpy := c.coordsToViewport(x, y)
 			if !areCoordinatesValid(x, y) {
 				continue
 			}
 			cell := d.tiles[x][y].getAppearance()
 			// is seen right now
-			if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
+			if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
 				d.tiles[x][y].wasSeenByPlayer = true
 				if d.tiles[x][y].lightLevel > 0 || d.tiles[x][y].isOpaque() {
-					renderCcell(cell, vpx, vpy)
+					c.renderCcell(cell, vpx, vpy)
 				} else {
-					renderCcellForceColor(cell, vpx, vpy, darkColor, false)
+					c.renderCcellForceColor(cell, vpx, vpy, c.darkColor, false)
 				}
 			} else { // is in fog of war
 				if d.tiles[x][y].wasSeenByPlayer {
-					renderCcellForceColor(cell, vpx, vpy, FogOfWarColor, false)
+					c.renderCcellForceColor(cell, vpx, vpy, c.FogOfWarColor, false)
 				}
 			}
 			cw.SetBgColor(cw.BLACK)
@@ -108,48 +118,39 @@ func renderLevel(d *gameMap, flush bool) {
 
 	//render pawns
 	for _, pawn := range d.pawns {
-		if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[pawn.x][pawn.y] {
-			renderPawn(pawn, false)
+		if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[pawn.x][pawn.y] {
+			c.renderPawn(pawn, false)
 		}
 	}
 
 	// render furniture
-	for _, furniture := range d.furnitures {
-		if RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[furniture.x][furniture.y] {
-			x, y := r_CoordsToViewport(furniture.x, furniture.y)
-			if furniture.canBeLooted() {
-				renderCcellForceColor(furniture.getStaticData().appearance, x, y, R_LOOTABLE_CABINET_COLOR, false)
-			} else {
-				renderCcell(furniture.getStaticData().appearance, x, y)
-			}
-		}
-	}
+	c.renderFurnitures()
 
 	//render noises
-	renderNoisesForPlayer()
+	c.renderNoisesForPlayer()
 
 	//render player
 	furnUnderPlayer := d.getFurnitureAt(d.player.x, d.player.y)
 	inverse := furnUnderPlayer != nil && furnUnderPlayer.getStaticData().canBeUsedAsCover
-	renderPawn(d.player, inverse)
+	c.renderPawn(d.player, inverse)
 
-	renderSidebar()
-	renderLog(false)
+	c.renderSidebar()
+	c.renderLog(false)
 
 	if flush {
 		cw.Flush_console()
 	}
 }
 
-func renderPawn(p *pawn, inverse bool) {
-	x, y := r_CoordsToViewport(p.x, p.y)
+func (c *consoleRenderer) renderPawn(p *pawn, inverse bool) {
+	x, y := c.coordsToViewport(p.x, p.y)
 	if p.ai != nil {
 		switch p.ai.currentState {
 		case AI_ALERTED:
-			renderCcellForceChar(p.getStaticData().ccell, x, y, '!')
+			c.renderCcellForceChar(p.getStaticData().ccell, x, y, '!')
 			return
 		case AI_SEARCHING:
-			renderCcellForceChar(p.getStaticData().ccell, x, y, '?')
+			c.renderCcellForceChar(p.getStaticData().ccell, x, y, '?')
 			return
 		}
 
@@ -157,59 +158,74 @@ func renderPawn(p *pawn, inverse bool) {
 	playerColor := CURRENT_MAP.player.getStaticData().ccell.color
 	if p == CURRENT_MAP.player {
 		if CURRENT_MAP.tiles[p.x][p.y].lightLevel == 0 {
-			playerColor = darkColor
+			playerColor = c.darkColor
 		}
-		renderCcellForceColor(p.getStaticData().ccell, x, y, playerColor, inverse)
+		c.renderCcellForceColor(p.getStaticData().ccell, x, y, playerColor, inverse)
 	} else {
-		renderCcell(p.getStaticData().ccell, x, y)
+		c.renderCcell(p.getStaticData().ccell, x, y)
 	}
 	cw.SetBgColor(cw.BLACK)
 }
 
-func renderSidebar() {
+func (c *consoleRenderer) renderFurnitures() {
+	for _, furniture := range CURRENT_MAP.furnitures {
+		if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[furniture.x][furniture.y] {
+			x, y := c.coordsToViewport(furniture.x, furniture.y)
+			if furniture.canBeLooted() {
+				c.renderCcellForceColor(furniture.getStaticData().appearance, x, y, c.R_LOOTABLE_CABINET_COLOR, false)
+			} else if furniture.getCurrentLightLevel() > 0 {
+				c.renderCcellForceColor(furniture.getStaticData().appearance, x, y, c.R_UI_COLOR_LIGHT, false)
+			} else {
+				c.renderCcell(furniture.getStaticData().appearance, x, y)
+			}
+		}
+	}
+}
+
+func (c *consoleRenderer) renderSidebar() {
 	psd := CURRENT_MAP.player.getStaticData()
 	p := CURRENT_MAP.player
 	cw.SetFgColor(cw.WHITE)
 	if p.isRunning {
-		cw.PutString(fmt.Sprintf("!! RUNNING !!"), R_VIEWPORT_WIDTH+1, 0)
+		cw.PutString(fmt.Sprintf("!! RUNNING !!"), c.R_VIEWPORT_WIDTH+1, 0)
 	} else {
-		cw.PutString(fmt.Sprintf(".. sneaking .."), R_VIEWPORT_WIDTH+1, 0)
+		cw.PutString(fmt.Sprintf(".. sneaking .."), c.R_VIEWPORT_WIDTH+1, 0)
 	}
-	cw.PutString(fmt.Sprintf("Health: %d/%d", CURRENT_MAP.player.hp, psd.maxhp), R_VIEWPORT_WIDTH+1, 1)
-	cw.PutString(fmt.Sprintf("Loot: %d", CURRENT_MAP.player.inv.gold), R_VIEWPORT_WIDTH+1, 2)
+	cw.PutString(fmt.Sprintf("Health: %d/%d", CURRENT_MAP.player.hp, psd.maxhp), c.R_VIEWPORT_WIDTH+1, 1)
+	cw.PutString(fmt.Sprintf("Loot: %d", CURRENT_MAP.player.inv.gold), c.R_VIEWPORT_WIDTH+1, 2)
 	for i, arrow := range p.inv.arrows {
 		if currPlayerController.currentSelectedArrowIndex == i {
 			cw.SetColor(cw.BLACK, cw.WHITE)
 		}
-		cw.PutString(fmt.Sprintf("%s: %d", arrow.name, arrow.amount), R_VIEWPORT_WIDTH+1, 4+i)
+		cw.PutString(fmt.Sprintf("%s: %d", arrow.name, arrow.amount), c.R_VIEWPORT_WIDTH+1, 4+i)
 		cw.SetColor(cw.WHITE, cw.BLACK)
 	}
 }
 
-func renderDamageFlash() {
+func (c *consoleRenderer) renderDamageFlash() {
 	cw.SetBgColor(cw.DARK_RED)
 	w, h := cw.GetConsoleSize()
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
-			cw.PutChar(' ',x, y)
+			cw.PutChar(' ', x, y)
 		}
 		cw.Flush_console()
 	}
 	cw.SetBgColor(cw.BLACK)
 }
 
-func renderNoisesForPlayer() {
+func (c *consoleRenderer) renderNoisesForPlayer() {
 	// log.AppendMessagef("%d noises total", len(CURRENT_MAP.noises))
 	for _, n := range CURRENT_MAP.noises {
 		if !CURRENT_MAP.currentPlayerVisibilityMap[n.x][n.y] || !n.showOnlyNotSeen {
 			// render only those noises in player's vicinity
 			if areCoordinatesInRangeFrom(n.x, n.y, CURRENT_MAP.player.x, CURRENT_MAP.player.y, n.intensity) {
 				if n.textBubble != "" {
-					x, y := r_CoordsToViewport(n.x, n.y)
+					x, y := c.coordsToViewport(n.x, n.y)
 					if n.creator != nil {
-						x, y = r_CoordsToViewport(n.creator.getCoords())
+						x, y = c.coordsToViewport(n.creator.getCoords())
 					}
-					x -= len(n.textBubble)/2
+					x -= len(n.textBubble) / 2
 					if n.suspicious {
 						if n.creator != nil {
 							cw.SetColor(cw.RED, cw.DARK_GRAY)
@@ -222,34 +238,39 @@ func renderNoisesForPlayer() {
 					cw.PutString(n.textBubble, x, y+1)
 					cw.SetBgColor(cw.BLACK)
 				} else {
-					x, y := r_CoordsToViewport(n.x, n.y)
-					renderCcell(&n.visual, x, y)
+					x, y := c.coordsToViewport(n.x, n.y)
+					c.renderCcell(&n.visual, x, y)
 				}
 			}
 		}
 	}
 }
 
-func renderCursor(cx, cy int, flush bool) {
+func (c *consoleRenderer) renderCursor(cx, cy int, flush bool) {
 	cw.SetFgColor(cw.YELLOW)
-	vx, vy := r_CoordsToViewport(cx, cy)
+	vx, vy := c.coordsToViewport(cx, cy)
 	cw.PutChar('X', vx, vy)
 	if flush {
 		cw.Flush_console()
 	}
 }
 
-func renderLog(flush bool) {
+func (c *consoleRenderer) renderLog(flush bool) {
 	cw.SetFgColor(cw.RED)
 	for i := 0; i < len(log.Last_msgs); i++ {
-		cw.PutString(log.Last_msgs[i].Message, 0, R_VIEWPORT_HEIGHT+i+1)
+		msg := log.Last_msgs[i]
+		stringToPut := msg.Message
+		if msg.Count > 1 {
+			stringToPut += fmt.Sprintf(" (x%d)", msg.Count)
+		}
+		cw.PutString(stringToPut, 0, c.R_VIEWPORT_HEIGHT+i+1)
 	}
 	if flush {
 		cw.Flush_console()
 	}
 }
 
-func renderCcell(cc *consoleCell, x, y int) {
+func (c *consoleRenderer) renderCcell(cc *consoleCell, x, y int) {
 	if cc.inverse {
 		cw.SetFgColor(cw.BLACK)
 		cw.SetBgColor(cc.color)
@@ -260,7 +281,7 @@ func renderCcell(cc *consoleCell, x, y int) {
 	cw.PutChar(cc.appearance, x, y)
 }
 
-func renderCcellForceColor(cc *consoleCell, x, y int, color int, forceInverse bool) {
+func (c *consoleRenderer) renderCcellForceColor(cc *consoleCell, x, y int, color int, forceInverse bool) {
 	if cc.inverse || forceInverse {
 		cw.SetFgColor(cw.BLACK)
 		cw.SetBgColor(color)
@@ -271,7 +292,7 @@ func renderCcellForceColor(cc *consoleCell, x, y int, color int, forceInverse bo
 	cw.PutChar(cc.appearance, x, y)
 }
 
-func renderCcellForceChar(cc *consoleCell, x, y int, char rune) {
+func (c *consoleRenderer) renderCcellForceChar(cc *consoleCell, x, y int, char rune) {
 	if cc.inverse {
 		cw.SetFgColor(cw.BLACK)
 		cw.SetBgColor(cc.color)

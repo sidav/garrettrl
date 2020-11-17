@@ -13,11 +13,11 @@ func (pc *playerController) playerControl(d *gameMap) {
 	p := d.player
 	if pc.previousHp > p.hp {
 		for i := pc.previousHp; i >= p.hp; i-- {
-			renderDamageFlash()
+			renderer.renderDamageFlash()
 		}
 	}
 	pc.previousHp = p.hp
-	renderLevel(&CURRENT_MAP, true)
+	renderer.renderLevel(&CURRENT_MAP, true)
 	if pc.checkGameState() {
 		return
 	}
@@ -78,13 +78,13 @@ func (pc *playerController) playerControl(d *gameMap) {
 			case "ESCAPE":
 				GAME_IS_RUNNING = false
 			case "INSERT":
-				RENDER_DISABLE_LOS = !RENDER_DISABLE_LOS
+				renderer.RENDER_DISABLE_LOS = !renderer.RENDER_DISABLE_LOS
 			case "HOME":
 				p.inv.gold += 111
 			default:
 				valid_key_pressed = false
 				log.AppendMessagef("Unknown key %s (Wrong keyboard layout?)", key_pressed)
-				renderLevel(d, true)
+				renderer.renderLevel(d, true)
 			}
 		}
 	}
@@ -120,8 +120,8 @@ func (p *playerController) keyToDirection(keyPressed string) (int, int) {
 func (pc *playerController) selectCoords(forceVisible bool) (int, int) {
 	sx, sy := CURRENT_MAP.player.getCoords()
 	for {
-		renderLevel(&CURRENT_MAP, false)
-		renderCursor(sx, sy, true)
+		renderer.renderLevel(&CURRENT_MAP, false)
+		renderer.renderCursor(sx, sy, true)
 		key := console.ReadKey()
 		if key == "ENTER" || key == "f" {
 			if !forceVisible || CURRENT_MAP.currentPlayerVisibilityMap[sx][sy] {
@@ -155,7 +155,7 @@ func (pc *playerController) doCloseDoor() {
 		}
 	} else if doorsAround > 1 {
 		log.AppendMessage("Which direction?")
-		renderLog(true)
+		renderer.renderLog(true)
 		dirx, diry := pc.keyToDirection(console.ReadKey())
 		if dirx != 0 || diry != 0 {
 			if CURRENT_MAP.isTileADoor(px+dirx, py+diry) {

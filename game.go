@@ -3,7 +3,7 @@ package main
 import (
 	cw "github.com/sidav/golibrl/console"
 	"github.com/sidav/golibrl/random/additive_random"
-	log2 "gorltemplate/game_log"
+	log2 "garrettrl/game_log"
 )
 
 var (
@@ -14,6 +14,7 @@ var (
 	GAME_IS_RUNNING      bool
 	log                  log2.GameLog
 	rnd                  additive_random.FibRandom
+	renderer             consoleRenderer
 	currPlayerController playerController
 	CURRENT_TURN         int
 	CURRENT_MAP          gameMap
@@ -35,12 +36,12 @@ func (g *game) runGame() {
 	log.Init(5)
 	rnd = additive_random.FibRandom{}
 	rnd.InitDefault()
-	updateBoundsIfNeccessary(true)
 
 	GAME_IS_RUNNING = true
 	CURRENT_MAP = gameMap{}
 	CURRENT_MAP.generateAndInitMap() // applyRuneMap(&testMap)
 
+	renderer.initDefaults()
 	for GAME_IS_RUNNING {
 		g.mainLoop()
 	}
@@ -51,7 +52,7 @@ func (g *game) mainLoop() {
 	CURRENT_MAP.currentPlayerVisibilityMap = *CURRENT_MAP.getFieldOfVisionFor(CURRENT_MAP.player)
 
 	for GAME_IS_RUNNING && CURRENT_MAP.player.isTimeToAct() {
-		renderLevel(&CURRENT_MAP, true)
+		renderer.renderLevel(&CURRENT_MAP, true)
 		currPlayerController.playerControl(&CURRENT_MAP)
 	}
 
