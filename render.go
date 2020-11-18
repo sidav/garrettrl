@@ -88,6 +88,7 @@ func (c *consoleRenderer) renderGameScreen(flush bool) {
 
 	c.renderLevel()
 
+	c.renderBodies()
 	//render pawns
 	for _, pawn := range CURRENT_MAP.pawns {
 		if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[pawn.x][pawn.y] {
@@ -145,6 +146,12 @@ func (c *consoleRenderer) renderPawn(p *pawn, inverse bool) {
 	x, y := c.coordsToViewport(p.x, p.y)
 	if p.ai != nil {
 		switch p.ai.currentState {
+		//case AI_ROAM:
+		//	c.renderCcellForceChar(p.getStaticData().ccell, x, y, 'R')
+		//	return
+		//case AI_PATROLLING:
+		//	c.renderCcellForceChar(p.getStaticData().ccell, x, y, 'P')
+		//	return
 		case AI_ALERTED:
 			c.renderCcellForceChar(p.getStaticData().ccell, x, y, '!')
 			return
@@ -154,8 +161,9 @@ func (c *consoleRenderer) renderPawn(p *pawn, inverse bool) {
 		}
 
 	}
-	playerColor := CURRENT_MAP.player.getStaticData().ccell.color
+
 	if p == CURRENT_MAP.player {
+		playerColor := CURRENT_MAP.player.getStaticData().ccell.color
 		if CURRENT_MAP.tiles[p.x][p.y].lightLevel == 0 {
 			playerColor = c.darkColor
 		}
@@ -164,6 +172,17 @@ func (c *consoleRenderer) renderPawn(p *pawn, inverse bool) {
 		c.renderCcell(p.getStaticData().ccell, x, y)
 	}
 	cw.SetBgColor(cw.BLACK)
+}
+
+func (c *consoleRenderer) renderBodies() {
+	for _, cBody := range CURRENT_MAP.bodies {
+		if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[cBody.x][cBody.y] {
+			x, y := c.coordsToViewport(cBody.x, cBody.y)
+			color := cBody.pawnOwner.getStaticData().ccell.color
+			cw.SetFgColor(color)
+			cw.PutChar('%', x, y)
+		}
+	}
 }
 
 func (c *consoleRenderer) renderFurnitures() {

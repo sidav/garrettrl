@@ -66,6 +66,7 @@ func (g *game) mainLoop() {
 		}
 	}
 	CURRENT_MAP.cleanupNoises()
+	CURRENT_MAP.checkBodiesForWakeUp()
 	CURRENT_TURN++
 }
 

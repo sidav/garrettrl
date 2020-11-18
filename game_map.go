@@ -12,6 +12,7 @@ type gameMap struct {
 	pawns                      []*pawn
 	furnitures                 []*furniture
 	noises                     []*noise
+	bodies                     []*body
 	//items       []*i_item
 	//projectiles []*projectile
 }
@@ -192,4 +193,20 @@ func (dung *gameMap) cleanupNoises() {
 		dung.noises[j] = nil
 	}
 	dung.noises = dung.noises[:i]
+}
+
+func (dung *gameMap) checkBodiesForWakeUp() {
+	i := 0
+	for _, b := range dung.bodies {
+		if b.turnToWakeUp > CURRENT_TURN {
+			dung.bodies[i] = b
+			i++
+		} else {
+			dung.pawns = append(dung.pawns, b.pawnOwner)
+		}
+	}
+	for j := i; j < len(dung.bodies); j++ {
+		dung.bodies[j] = nil
+	}
+	dung.bodies = dung.bodies[:i]
 }

@@ -79,7 +79,8 @@ func (dung *gameMap) spawnPlayer(l *generator2.Level) {
 		}
 	}
 	if len(entrypoints) > 0 {
-		randEntryIndex := rnd.Rand(len(entrypoints))
+		randEntryIndex := rnd.Rand(101) % len(entrypoints) // TODO: find why that hack is even needed.
+		log.AppendMessage(fmt.Sprintf("Used %dth entry from %d entrypoints found.", randEntryIndex+1, len(entrypoints)))
 		CURRENT_MAP.player.x = entrypoints[randEntryIndex][0]
 		CURRENT_MAP.player.y = entrypoints[randEntryIndex][1]
 	}
@@ -114,7 +115,7 @@ func (dung *gameMap) addRandomFurniture() {
 			// placement rule
 			if dung.isTilePassableAndNotOccupied(x, y) &&
 				dung.getNumberOfTilesOfTypeAround(TILE_WALL, x, y) <= 3 &&
-				dung.getNumberOfTilesOfTypeAround(TILE_FLOOR, x, y) > 2 {
+				dung.getNumberOfTilesOfTypeAround(TILE_FLOOR, x, y) > 4 {
 				suitableTableCoords = append(suitableTableCoords, [2]int{x, y})
 			}
 		}

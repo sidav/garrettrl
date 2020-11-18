@@ -41,10 +41,10 @@ func (d *gameMap) getPathFromTo(fx, fy, tx, ty int, considerPawns bool) *astar.C
 		path = astar.FindPath(&d.pathfindingCostMap, fx, fy, tx, ty, true,
 			pathfindingDepths[i], true, true)
 		if checkIfPathLeadsToFinish(path, tx, ty) {
-			log.AppendMessagef("Finished with %d depth", pathfindingDepths[i])
+			// log.AppendMessagef("Finished with %d depth", pathfindingDepths[i])
 			break
 		}
-		log.AppendMessage("Increasing depth...")
+		// log.AppendMessage("Increasing depth...")
 	}
 	return path
 }

@@ -61,6 +61,16 @@ func (p *pawn) getHpPercent() int {
 	return p.hp * 100 / p.getStaticData().maxhp
 }
 
+func (p *pawn) createBody(willSleepFor int) *body {
+	newBody := body{
+		x:            p.x,
+		y:            p.y,
+		turnToWakeUp: willSleepFor + CURRENT_TURN,
+		pawnOwner:    p,
+	}
+	return &newBody
+}
+
 func (p *pawn) createMovementNoise() *noise {
 	intensity := p.getStaticData().walkingNoiseIntensity
 	if p.isRunning {
