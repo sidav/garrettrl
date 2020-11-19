@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/sidav/golibrl/graphic_primitives"
 )
 
@@ -129,7 +130,7 @@ func (dung *gameMap) visibleLineExists(fx, fy, tx, ty int, ignoreStart bool) boo
 }
 
 // true if action has been commited
-func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, vy int) bool {
+func (dung *gameMap) defaultMovementActionByVector(p *pawn, mayOpenDoor bool, vx, vy int) bool {
 	x, y := p.getCoords()
 	x += vx
 	y += vy
@@ -153,9 +154,20 @@ func (dung *gameMap) movePawnOrOpenDoorByVector(p *pawn, mayOpenDoor bool, vx, v
 			p.spendTurnsForAction(p.getStaticData().timeForWalking)
 			return true
 		}
+		// steal from furniture (if the pawn is player)
 		if furn.canBeLooted() && p == dung.player {
 			p.inv.grabEverythingFromInventory(furn.inv)
+			stealString := fmt.Sprintf("Stole %d gold", furn.inv.gold)
+			for _, arrow := range furn.inv.arrows {
+				if arrow.amount == 1 {
+					stealString += ", " + arrow.name
+				} else if arrow.amount > 1 {
+					stealString += fmt.Sprintf(", x%d %s", arrow.amount, arrow.name)
+				}
+			}
+			stealString += "."
 			furn.inv = nil
+			log.AppendMessage(stealString)
 			// create noise?
 			p.spendTurnsForAction(20)
 			return true

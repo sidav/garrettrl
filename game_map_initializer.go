@@ -87,20 +87,21 @@ func (dung *gameMap) spawnPlayer(l *generator2.Level) {
 }
 
 func (dung *gameMap) spawnFurnitureFromGenerated(l *generator2.Level) {
-	// check if generated map has an entry point
 	for _, i := range l.Items {
-		if i.Name == "TORCH" {
+		switch i.Name {
+		case "ENTRYPOINT":
+			continue // do nothing
+		case "TORCH":
 			newF := furniture{code: FURNITURE_TORCH, x: i.X, y: i.Y, isLit: true}
 			dung.furnitures = append(dung.furnitures, &newF)
-		}
-		if i.Name == "TABLE" {
+		case "TABLE":
 			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TABLE, x: i.X, y: i.Y})
-		}
-		if i.Name == "CABINET" {
+		case "CABINET":
 			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_CABINET, x: i.X, y: i.Y})
-		}
-		if i.Name == "BUSH" {
+		case "BUSH":
 			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_BUSH, x: i.X, y: i.Y})
+		default:
+			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_UNDEFINED, x: i.X, y: i.Y})
 		}
 	}
 }
@@ -183,7 +184,7 @@ func (d *gameMap) distributeLootBetweenCabinets(minimumGoldAmount int) {
 			totalCabinetsOnMap++
 		}
 	}
-	avgGoldPerCabinet := minimumGoldAmount/totalCabinetsOnMap
+	avgGoldPerCabinet := minimumGoldAmount / totalCabinetsOnMap
 	minGoldPerCabinet := avgGoldPerCabinet - 25
 	if minGoldPerCabinet < 0 {
 		minGoldPerCabinet = 0
@@ -194,16 +195,20 @@ func (d *gameMap) distributeLootBetweenCabinets(minimumGoldAmount int) {
 			f.inv = &inventory{}
 			f.inv.init()
 			f.inv.gold = rnd.RandInRange(minGoldPerCabinet, maxGoldPerCabinet)
-			if rnd.OneChanceFrom(2) {
+			// water
+			if rnd.OneChanceFrom(3) {
 				f.inv.arrows[0].amount = 1
 			}
-			if rnd.OneChanceFrom(5) {
+			// noise
+			if rnd.OneChanceFrom(10) {
 				f.inv.arrows[1].amount = 1
 			}
+			// gas
 			if rnd.OneChanceFrom(10) {
 				f.inv.arrows[2].amount = 1
 			}
-			if rnd.OneChanceFrom(4) {
+			// explosive
+			if rnd.OneChanceFrom(15) {
 				f.inv.arrows[3].amount = 1
 			}
 		}

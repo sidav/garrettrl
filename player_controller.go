@@ -97,7 +97,7 @@ func (pc *playerController) playerControl(d *gameMap) {
 	}
 	// move player's pawn here and something
 	if movex != 0 || movey != 0 {
-		CURRENT_MAP.movePawnOrOpenDoorByVector(p, true, movex, movey)
+		CURRENT_MAP.defaultMovementActionByVector(p, true, movex, movey)
 	}
 }
 

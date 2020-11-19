@@ -78,7 +78,7 @@ func (p *pawn) ai_TryMoveOrOpenDoorOrAlert(dirx, diry int) bool {
 			if CURRENT_MAP.isTileADoor(p.x, p.y) && CURRENT_MAP.tiles[p.x][p.y].isOpened {
 				CURRENT_MAP.tiles[p.x][p.y].isOpened = false
 			}
-			CURRENT_MAP.movePawnOrOpenDoorByVector(p, true, dirx, diry)
+			CURRENT_MAP.defaultMovementActionByVector(p, true, dirx, diry)
 		}
 		return true
 	}
