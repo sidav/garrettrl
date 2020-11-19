@@ -70,6 +70,8 @@ func (dung *gameMap) spawnPlayer(l *generator2.Level) {
 	CURRENT_MAP.player = initNewPawn(PAWN_PLAYER, 1, 1, false)
 	CURRENT_MAP.player.inv = &inventory{}
 	CURRENT_MAP.player.inv.init()
+	CURRENT_MAP.player.inv.arrows[0].amount = 2
+	CURRENT_MAP.player.inv.arrows[1].amount = 1
 	// check if generated map has an entry point
 	// and select one at random
 	entrypoints := make([][2]int, 0)
