@@ -15,7 +15,7 @@ func (i *inventory) init() {
 	i.arrows = []arrow{
 		{name: "Water arrow", amount: 1},
 		{name: "Gas arrow", amount: 1},
-		{name: "Explosive arrow", amount: 0},
+		{name: "Explosive arrow", amount: 1},
 		{name: "Noise arrow", amount: 1},
 	}
 }

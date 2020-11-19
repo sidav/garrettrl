@@ -198,7 +198,7 @@ func (dung *gameMap) cleanupNoises() {
 func (dung *gameMap) checkBodiesForWakeUp() {
 	i := 0
 	for _, b := range dung.bodies {
-		if b.turnToWakeUp > CURRENT_TURN {
+		if b.turnToWakeUp > CURRENT_TURN || b.turnToWakeUp == -1 {
 			dung.bodies[i] = b
 			i++
 		} else {
@@ -209,4 +209,12 @@ func (dung *gameMap) checkBodiesForWakeUp() {
 		dung.bodies[j] = nil
 	}
 	dung.bodies = dung.bodies[:i]
+}
+
+func (d *gameMap) removeFurniture(furn *furniture) {
+	for i := 0; i < len(d.furnitures); i++ {
+		if furn == d.furnitures[i] {
+			d.furnitures = append(d.furnitures[:i], d.furnitures[i+1:]...) // ow it's fucking... magic!
+		}
+	}
 }

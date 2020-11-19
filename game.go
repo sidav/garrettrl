@@ -56,8 +56,13 @@ func (g *game) mainLoop() {
 		currPlayerController.playerControl(&CURRENT_MAP)
 	}
 
-	// check if pawns should be removed
 	for i := 0; i < len(CURRENT_MAP.pawns); i++ {
+		if CURRENT_MAP.pawns[i].isDead() {
+			newBody := CURRENT_MAP.pawns[i].createBody(-1)
+			CURRENT_MAP.bodies = append(CURRENT_MAP.bodies, newBody)
+			CURRENT_MAP.removePawn(CURRENT_MAP.pawns[i])
+			continue
+		}
 		if CURRENT_MAP.pawns[i].isTimeToAct() {
 			// ai_act for pawns here
 			if CURRENT_MAP.pawns[i].ai != nil {

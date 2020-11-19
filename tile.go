@@ -10,16 +10,18 @@ const (
 	TILE_FLOOR
 	TILE_DOOR
 	TILE_WINDOW
+	TILE_RUBBISH
 )
 
 type tileStaticData struct {
 	blocksMovement, blocksVision bool
+	alwaysMakesNoise             bool
 	appearance                   *consoleCell
 }
 
-var tileStaticTable = map[tileCode] tileStaticData {
+var tileStaticTable = map[tileCode]tileStaticData{
 	TILE_UNDEFINED: {
-		blocksMovement: false,
+		blocksMovement: true,
 		blocksVision:   false,
 		appearance: &consoleCell{
 			appearance: '?',
@@ -27,8 +29,18 @@ var tileStaticTable = map[tileCode] tileStaticData {
 			inverse:    true,
 		},
 	},
-	TILE_WALL: {
+	TILE_RUBBISH: {
 		blocksMovement: false,
+		blocksVision:   false,
+		alwaysMakesNoise: true,
+		appearance: &consoleCell{
+			appearance: ',',
+			color:      cw.YELLOW,
+			inverse:    false,
+		},
+	},
+	TILE_WALL: {
+		blocksMovement: true,
 		blocksVision:   true,
 		appearance: &consoleCell{
 			appearance: ' ',
@@ -37,7 +49,7 @@ var tileStaticTable = map[tileCode] tileStaticData {
 		},
 	},
 	TILE_DOOR: {
-		blocksMovement: false,
+		blocksMovement: true,
 		blocksVision:   true,
 		appearance: &consoleCell{
 			appearance: '+',
@@ -46,7 +58,7 @@ var tileStaticTable = map[tileCode] tileStaticData {
 		},
 	},
 	TILE_FLOOR: {
-		blocksMovement: true,
+		blocksMovement: false,
 		blocksVision:   false,
 		appearance: &consoleCell{
 			appearance: '.',
@@ -55,7 +67,7 @@ var tileStaticTable = map[tileCode] tileStaticData {
 		},
 	},
 	TILE_WINDOW: {
-		blocksMovement: false,
+		blocksMovement: true,
 		blocksVision:   false,
 		appearance: &consoleCell{
 			appearance: '#',
@@ -66,10 +78,10 @@ var tileStaticTable = map[tileCode] tileStaticData {
 }
 
 type d_tile struct {
-	code tileCode
+	code            tileCode
 	wasSeenByPlayer bool
-	lightLevel int
-	isOpened bool // only if tile is a door
+	lightLevel      int
+	isOpened        bool // only if tile is a door
 }
 
 func (t *d_tile) getAppearance() *consoleCell {
@@ -91,7 +103,7 @@ func (t *d_tile) isPassable() bool {
 	if t.isOpened {
 		return true
 	}
-	return tileStaticTable[t.code].blocksMovement
+	return !tileStaticTable[t.code].blocksMovement
 }
 
 func (t *d_tile) isOpaque() bool {
@@ -99,4 +111,8 @@ func (t *d_tile) isOpaque() bool {
 		return false
 	}
 	return tileStaticTable[t.code].blocksVision
+}
+
+func (t *d_tile) isAlwaysNoisy() bool {
+	return tileStaticTable[t.code].alwaysMakesNoise
 }

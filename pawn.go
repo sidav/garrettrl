@@ -68,13 +68,25 @@ func (p *pawn) createBody(willSleepFor int) *body {
 		turnToWakeUp: willSleepFor + CURRENT_TURN,
 		pawnOwner:    p,
 	}
+	if willSleepFor == -1 {
+		newBody.turnToWakeUp = -1 // -1 means forever
+	}
 	return &newBody
 }
 
 func (p *pawn) createMovementNoise() *noise {
+	textBubble := ""
+	suspicious := p.isRunning
+	showOnlyNotSeen := true
 	intensity := p.getStaticData().walkingNoiseIntensity
 	if p.isRunning {
 		intensity = p.getStaticData().runningNoiseIntensity
+	}
+	if CURRENT_MAP.tiles[p.x][p.y].isAlwaysNoisy() {
+		intensity += 3
+		textBubble = "*crunch*"
+		suspicious = suspicious || (p == CURRENT_MAP.player)
+		showOnlyNotSeen = !suspicious
 	}
 	nse := &noise{
 		creator:   p,
@@ -86,8 +98,9 @@ func (p *pawn) createMovementNoise() *noise {
 			color:      cw.BLUE,
 			inverse:    false,
 		},
-		suspicious:      p.isRunning,
-		showOnlyNotSeen: true,
+		suspicious:      suspicious,
+		textBubble:      textBubble,
+		showOnlyNotSeen: showOnlyNotSeen,
 	}
 	return nse
 }
