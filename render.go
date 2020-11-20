@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	cw "github.com/sidav/golibrl/console"
+	"strings"
 )
 
 type consoleRenderer struct {
@@ -322,6 +323,22 @@ func (c *consoleRenderer) renderCcellForceChar(cc *consoleCell, x, y int, char r
 		cw.SetBgColor(cw.BLACK)
 	}
 	cw.PutChar(char, x, y)
+}
+
+// puts wrapped text in rectangle.
+func (c *consoleRenderer) putTextInRect(text string, x, y, w, h int) {
+	cx, cy := x, y
+	splittedText := strings.Split(text, " ")
+	for _, word := range splittedText {
+		if cx-x + len(word) > w || word == "\\n" {
+			cx = 0
+			cy += 1
+		}
+		if word != "\\n" {
+			cw.PutString(word+" ", cx, cy)
+			cx += len(word) + 2
+		}
+	}
 }
 
 //func renderLine(char rune, fromx, fromy, tox, toy int, flush, exceptFirstAndLast bool) {
