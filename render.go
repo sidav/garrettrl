@@ -124,7 +124,7 @@ func (c *consoleRenderer) renderLevel() {
 			if !areCoordinatesValid(x, y) {
 				continue
 			}
-			tile := CURRENT_MAP.tiles[x][y]
+			tile := &CURRENT_MAP.tiles[x][y]
 			cell := tile.getAppearance()
 			// is seen right now
 			if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
