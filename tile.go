@@ -88,7 +88,7 @@ func (t *d_tile) getAppearance() *consoleCell {
 	if t.isOpened {
 		return &consoleCell{
 			appearance: '\\',
-			color:      cw.DARK_MAGENTA,
+			color:      cw.DARK_YELLOW,
 			inverse:    false,
 		}
 	}
