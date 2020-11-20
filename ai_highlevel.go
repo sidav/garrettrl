@@ -23,6 +23,9 @@ type aiData struct {
 	currentWaypointIndex int
 
 	searchx, searchy int // for search
+
+	initialx, initialy int // for determining stuck guards
+	timesBeingStuck    int
 }
 
 func (a *aiData) setStateTimeout(duration int) {
@@ -30,6 +33,9 @@ func (a *aiData) setStateTimeout(duration int) {
 }
 
 func (p *pawn) ai_act() {
+	// set stuck-check
+	p.ai.initialx = p.x
+	p.ai.initialy = p.y
 	// first, check situation
 	switch p.ai.currentState {
 	case AI_ROAM, AI_PATROLLING:
@@ -61,11 +67,25 @@ func (p *pawn) ai_act() {
 			log.AppendMessage("No ACT func for some ai state!")
 		}
 	}
+	p.ai_checkStuck()
 }
 
 func (p *pawn) ai_produceIdleChatter() {
 	if p.ai_isCalm() && rnd.OneChanceFrom(IDLE_CHATTER_FREQUENCY) {
 		p.doTextbubbleNoise(p.getStaticData().getRandomResponseTo(SITUATION_IDLE_CHATTER), 12, false, false)
+	}
+}
+
+func (p *pawn) ai_checkStuck() {
+	// if AI is stuck and calm...
+	if p.x == p.ai.initialx && p.y == p.ai.initialy {
+		p.ai.timesBeingStuck++
+	} else {
+		p.ai.timesBeingStuck = 0
+	}
+	if p.ai_isCalm() && p.ai.timesBeingStuck >= 10 {
+		p.ai.currentState = AI_ROAM
+		p.ai.setStateTimeout(30)
 	}
 }
 
@@ -147,7 +167,7 @@ func (p *pawn) ai_actSearching() {
 	if p.x == ai.searchx && p.y == ai.searchy {
 		for !CURRENT_MAP.isTilePassableAndNotOccupied(ai.searchx, ai.searchy) {
 			ai.searchx, ai.searchy = rnd.RandInRange(p.x-SEARCH_ROAM_RADIUS, p.x+SEARCH_ROAM_RADIUS),
-			rnd.RandInRange(p.y-SEARCH_ROAM_RADIUS, p.y+SEARCH_ROAM_RADIUS)
+				rnd.RandInRange(p.y-SEARCH_ROAM_RADIUS, p.y+SEARCH_ROAM_RADIUS)
 		}
 	}
 	p.ai_tryToMoveToCoords(ai.searchx, ai.searchy)

@@ -124,17 +124,18 @@ func (c *consoleRenderer) renderLevel() {
 			if !areCoordinatesValid(x, y) {
 				continue
 			}
-			cell := CURRENT_MAP.tiles[x][y].getAppearance()
+			tile := CURRENT_MAP.tiles[x][y]
+			cell := tile.getAppearance()
 			// is seen right now
 			if c.RENDER_DISABLE_LOS || CURRENT_MAP.currentPlayerVisibilityMap[x][y] {
-				CURRENT_MAP.tiles[x][y].wasSeenByPlayer = true
-				if CURRENT_MAP.tiles[x][y].lightLevel > 0 || CURRENT_MAP.tiles[x][y].isOpaque() {
+				tile.wasSeenByPlayer = true
+				if tile.lightLevel > 0 || tile.isOpaque() && !tile.isDoor() {
 					c.renderCcell(cell, vpx, vpy)
 				} else {
 					c.renderCcellForceColor(cell, vpx, vpy, c.darkColor, false)
 				}
 			} else { // is in fog of war
-				if CURRENT_MAP.tiles[x][y].wasSeenByPlayer {
+				if tile.wasSeenByPlayer {
 					c.renderCcellForceColor(cell, vpx, vpy, c.FogOfWarColor, false)
 				}
 			}

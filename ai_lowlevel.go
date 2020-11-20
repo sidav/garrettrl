@@ -4,7 +4,8 @@ import "github.com/sidav/golibrl/geometry"
 
 func (p *pawn) ai_timeoutState() {
 	if p.ai.currentStateTimeoutTurn < CURRENT_TURN {
-		if p.ai.currentState == AI_SEARCHING {
+		switch p.ai.currentState {
+		case AI_SEARCHING:
 			textbubble := p.getStaticData().getRandomResponseTo(SITUATION_SEARCH_STOPPED)
 			p.doTextbubbleNoise(textbubble, CURRENT_MAP.player.getStaticData().sightRangeAlerted, false, false)
 			// reset to one if calm states
@@ -13,8 +14,12 @@ func (p *pawn) ai_timeoutState() {
 			} else {
 				p.ai.currentState = AI_ROAM
 			}
-		} else if p.ai.currentState == AI_ALERTED {
+		case AI_ALERTED:
 			p.ai.currentState = AI_SEARCHING
+		case AI_ROAM:
+			if p.ai.route != nil {
+				p.ai.currentState = AI_PATROLLING
+			}
 		}
 		p.ai.setStateTimeout(250)
 	}

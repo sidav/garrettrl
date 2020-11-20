@@ -53,7 +53,7 @@ var tileStaticTable = map[tileCode]tileStaticData{
 		blocksVision:   true,
 		appearance: &consoleCell{
 			appearance: '+',
-			color:      cw.DARK_MAGENTA,
+			color:      cw.DARK_YELLOW,
 			inverse:    false,
 		},
 	},
