@@ -38,8 +38,11 @@ func (g *game) runGame() {
 	rnd.InitDefault()
 
 	GAME_IS_RUNNING = true
-	CURRENT_MAP = gameMap{}
-	CURRENT_MAP.generateAndInitMap() // applyRuneMap(&testMap)
+	mInit := missionInitializer{
+		roamingEnemiesCount:    5,
+		totalDesiredLootAmount: 1000,
+	}
+	mInit.initializeMission()
 
 	renderer.initDefaults()
 	for GAME_IS_RUNNING {

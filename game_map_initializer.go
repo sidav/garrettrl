@@ -5,23 +5,18 @@ import (
 	generator2 "parcelcreationtool/generator"
 )
 
-func (dung *gameMap) initialize_level() { //crap of course
-	dung.pawns = make([]*pawn, 0)
+type missionInitializer struct {
+	roamingEnemiesCount    int
+	totalDesiredLootAmount int
 }
 
-func (dung *gameMap) initTilesArrayForSize(sx, sy int) {
-	dung.tiles = make([][]d_tile, sx)
-	for i := range dung.tiles {
-		dung.tiles[i] = make([]d_tile, sy)
-	}
-	dung.pathfindingCostMap = make([][]int, sx)
-	for i := range dung.pathfindingCostMap {
-		dung.pathfindingCostMap[i] = make([]int, sy)
-	}
+func (m *missionInitializer) initializeMission() { //crap of course
+	CURRENT_MAP = gameMap{}
+	CURRENT_MAP.pawns = make([]*pawn, 0)
+	m.generateAndInitMap()
 }
 
-func (dung *gameMap) generateAndInitMap() {
-	dung.initialize_level()
+func (m *missionInitializer) generateAndInitMap() {
 	generator := generator2.Generator{}
 	generatedMap := generator.Generate("parcels", "templates", 0, 0, 9)
 	generatedMapString := make([]string, 0)
@@ -32,41 +27,41 @@ func (dung *gameMap) generateAndInitMap() {
 		}
 		generatedMapString = append(generatedMapString, currStr)
 	}
-	dung.applyRuneMap(&generatedMapString)
-	dung.spawnPlayer(generatedMap)
-	dung.spawnFurnitureFromGenerated(generatedMap)
-	dung.addRandomFurniture()
-	dung.spawnEnemiesAtRoutes(generatedMap)
-	dung.spawnRoamingEnemies(5)
-	dung.distributeLootBetweenCabinets(1000)
+	m.applyRuneMap(&generatedMapString)
+	m.spawnPlayer(generatedMap)
+	m.spawnFurnitureFromGenerated(generatedMap)
+	m.addRandomFurniture()
+	m.spawnEnemiesAtRoutes(generatedMap)
+	m.spawnRoamingEnemies()
+	m.distributeLootBetweenCabinets()
 }
 
-func (dung *gameMap) applyRuneMap(generated_map *[]string) {
+func (m *missionInitializer) applyRuneMap(generated_map *[]string) {
 	levelsizex = len(*generated_map)
 	levelsizey = len((*generated_map)[0])
-	dung.initTilesArrayForSize(levelsizex, levelsizey)
+	CURRENT_MAP.initTilesArrayForSize(levelsizex, levelsizey)
 
 	for x := 0; x < levelsizex; x++ {
 		for y := 0; y < levelsizey; y++ {
-			currDungCell := &dung.tiles[x][y]
+			currCURRENT_MAPCell := &CURRENT_MAP.tiles[x][y]
 			currGenCell := (*generated_map)[x][y] //GetCell(x, y)
 			switch currGenCell {
 			case '#':
-				currDungCell.code = TILE_WALL
+				currCURRENT_MAPCell.code = TILE_WALL
 			case '.':
-				currDungCell.code = TILE_FLOOR
+				currCURRENT_MAPCell.code = TILE_FLOOR
 			case '+':
-				currDungCell.code = TILE_DOOR
+				currCURRENT_MAPCell.code = TILE_DOOR
 			case '\'':
-				currDungCell.code = TILE_WINDOW
+				currCURRENT_MAPCell.code = TILE_WINDOW
 			default:
-				currDungCell.code = TILE_UNDEFINED
+				currCURRENT_MAPCell.code = TILE_UNDEFINED
 			}
 		}
 	}
 }
 
-func (dung *gameMap) spawnPlayer(l *generator2.Level) {
+func (m *missionInitializer) spawnPlayer(l *generator2.Level) {
 	CURRENT_MAP.player = initNewPawn(PAWN_PLAYER, 1, 1, false)
 	CURRENT_MAP.player.inv = &inventory{}
 	CURRENT_MAP.player.inv.init()
@@ -88,27 +83,27 @@ func (dung *gameMap) spawnPlayer(l *generator2.Level) {
 	}
 }
 
-func (dung *gameMap) spawnFurnitureFromGenerated(l *generator2.Level) {
+func (m *missionInitializer) spawnFurnitureFromGenerated(l *generator2.Level) {
 	for _, i := range l.Items {
 		switch i.Name {
 		case "ENTRYPOINT":
 			continue // do nothing
 		case "TORCH":
 			newF := furniture{code: FURNITURE_TORCH, x: i.X, y: i.Y, isLit: true}
-			dung.furnitures = append(dung.furnitures, &newF)
+			CURRENT_MAP.furnitures = append(CURRENT_MAP.furnitures, &newF)
 		case "TABLE":
-			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_TABLE, x: i.X, y: i.Y})
+			CURRENT_MAP.furnitures = append(CURRENT_MAP.furnitures, &furniture{code: FURNITURE_TABLE, x: i.X, y: i.Y})
 		case "CABINET":
-			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_CABINET, x: i.X, y: i.Y})
+			CURRENT_MAP.furnitures = append(CURRENT_MAP.furnitures, &furniture{code: FURNITURE_CABINET, x: i.X, y: i.Y})
 		case "BUSH":
-			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_BUSH, x: i.X, y: i.Y})
+			CURRENT_MAP.furnitures = append(CURRENT_MAP.furnitures, &furniture{code: FURNITURE_BUSH, x: i.X, y: i.Y})
 		default:
-			dung.furnitures = append(dung.furnitures, &furniture{code: FURNITURE_UNDEFINED, x: i.X, y: i.Y})
+			CURRENT_MAP.furnitures = append(CURRENT_MAP.furnitures, &furniture{code: FURNITURE_UNDEFINED, x: i.X, y: i.Y})
 		}
 	}
 }
 
-func (dung *gameMap) addRandomFurniture() {
+func (m *missionInitializer) addRandomFurniture() {
 	w, h := CURRENT_MAP.getSize()
 	// tables
 	const TABLES = 0
@@ -116,9 +111,9 @@ func (dung *gameMap) addRandomFurniture() {
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
 			// placement rule
-			if dung.isTilePassableAndNotOccupied(x, y) &&
-				dung.getNumberOfTilesOfTypeAround(TILE_WALL, x, y) <= 3 &&
-				dung.getNumberOfTilesOfTypeAround(TILE_FLOOR, x, y) > 4 {
+			if CURRENT_MAP.isTilePassableAndNotOccupied(x, y) &&
+				CURRENT_MAP.getNumberOfTilesOfTypeAround(TILE_WALL, x, y) <= 3 &&
+				CURRENT_MAP.getNumberOfTilesOfTypeAround(TILE_FLOOR, x, y) > 4 {
 				suitableTableCoords = append(suitableTableCoords, [2]int{x, y})
 			}
 		}
@@ -135,7 +130,7 @@ func (dung *gameMap) addRandomFurniture() {
 		for needChangeIndex {
 			needChangeIndex = false
 			currTableCoordIndex = rnd.Rand(len(suitableTableCoords))
-			for _, f := range dung.furnitures {
+			for _, f := range CURRENT_MAP.furnitures {
 				if f.x == suitableTableCoords[currTableCoordIndex][0] &&
 					f.y == suitableTableCoords[currTableCoordIndex][1] {
 					needChangeIndex = true
@@ -143,7 +138,7 @@ func (dung *gameMap) addRandomFurniture() {
 				}
 			}
 		}
-		dung.furnitures = append(dung.furnitures, &furniture{
+		CURRENT_MAP.furnitures = append(CURRENT_MAP.furnitures, &furniture{
 			code: FURNITURE_TABLE,
 			x:    suitableTableCoords[currTableCoordIndex][0],
 			y:    suitableTableCoords[currTableCoordIndex][1],
@@ -154,45 +149,45 @@ func (dung *gameMap) addRandomFurniture() {
 	}
 }
 
-func (dung *gameMap) spawnEnemiesAtRoutes(l *generator2.Level) {
+func (m *missionInitializer) spawnEnemiesAtRoutes(l *generator2.Level) {
 	for r_index := range l.Routes {
 		r := l.Routes[r_index]
 		if len(r.Waypoints) > 0 {
 			newEnemy := initNewPawn(PAWN_GUARD, r.Waypoints[0].X, r.Waypoints[0].Y, true)
 			newEnemy.ai.route = &r
 			newEnemy.ai.currentState = AI_PATROLLING
-			dung.pawns = append(dung.pawns, newEnemy)
+			CURRENT_MAP.pawns = append(CURRENT_MAP.pawns, newEnemy)
 		}
 	}
 }
 
-func (dung *gameMap) spawnRoamingEnemies(count int) {
+func (m *missionInitializer) spawnRoamingEnemies() {
 	x := -1
 	y := -1
-	w, h := dung.getSize()
-	for i := 0; i < count; i++ {
-		for !dung.isTilePassableAndNotOccupied(x, y) {
+	w, h := CURRENT_MAP.getSize()
+	for i := 0; i < m.roamingEnemiesCount; i++ {
+		for !CURRENT_MAP.isTilePassableAndNotOccupied(x, y) {
 			x, y = rnd.Rand(w), rnd.Rand(h)
 		}
 		newEnemy := initNewPawn(PAWN_GUARD, x, y, true)
-		dung.pawns = append(dung.pawns, newEnemy)
+		CURRENT_MAP.pawns = append(CURRENT_MAP.pawns, newEnemy)
 	}
 }
 
-func (d *gameMap) distributeLootBetweenCabinets(minimumGoldAmount int) {
+func (m *missionInitializer) distributeLootBetweenCabinets() {
 	totalCabinetsOnMap := 0
-	for _, f := range d.furnitures {
+	for _, f := range CURRENT_MAP.furnitures {
 		if f.code == FURNITURE_CABINET {
 			totalCabinetsOnMap++
 		}
 	}
-	avgGoldPerCabinet := minimumGoldAmount / totalCabinetsOnMap
+	avgGoldPerCabinet := m.totalDesiredLootAmount / totalCabinetsOnMap
 	minGoldPerCabinet := avgGoldPerCabinet - 25
 	if minGoldPerCabinet < 0 {
 		minGoldPerCabinet = 0
 	}
 	maxGoldPerCabinet := avgGoldPerCabinet + 75
-	for _, f := range d.furnitures {
+	for _, f := range CURRENT_MAP.furnitures {
 		if f.code == FURNITURE_CABINET {
 			f.inv = &inventory{}
 			f.inv.init()

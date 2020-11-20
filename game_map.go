@@ -68,6 +68,17 @@ func (d *gameMap) removePawn(p *pawn) {
 	}
 }
 
+func (d *gameMap) initTilesArrayForSize(sx, sy int) {
+	d.tiles = make([][]d_tile, sx)
+	for i := range d.tiles {
+		d.tiles[i] = make([]d_tile, sy)
+	}
+	d.pathfindingCostMap = make([][]int, sx)
+	for i := range d.pathfindingCostMap {
+		d.pathfindingCostMap[i] = make([]int, sy)
+	}
+}
+
 func (d *gameMap) getNumberOfTilesOfTypeAround(ttype tileCode, x, y int) int {
 	number := 0
 	for i := x - 1; i <= x+1; i++ {
