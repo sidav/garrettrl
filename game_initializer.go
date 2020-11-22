@@ -1,20 +1,21 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	cw "github.com/sidav/golibrl/console"
+	"github.com/sidav/golibrl/console_menu"
+	"io/ioutil"
 	generator2 "parcelcreationtool/generator"
 )
 
 type missionInitializer struct {
-	roamingEnemiesCount    int
-	totalDesiredLootAmount int
 }
 
 func (m *missionInitializer) initializeMission(missionNumber int) { //crap of course
 	CURRENT_MAP = gameMap{}
 	CURRENT_MAP.pawns = make([]*pawn, 0)
 	filesDir := fmt.Sprintf("missions/mission%d/", missionNumber)
-
 	m.generateAndInitMap(filesDir)
 }
 
@@ -29,13 +30,26 @@ func (m *missionInitializer) generateAndInitMap(filesPath string) {
 		}
 		generatedMapString = append(generatedMapString, currStr)
 	}
+
+	// mission unmarshalling
+	mis := &Mission{}
+	jsn, err := ioutil.ReadFile(filesPath+"mission.json")
+	if err == nil {
+		json.Unmarshal(jsn, mis)
+	} else {
+		panic(err)
+	}
+	renderer.putTextInRect(mis.BriefingText, 0, 0, 0)
+	cw.ReadKey()
+	difficulty := console_menu.ShowSingleChoiceMenu("Select difficulty:", "", []string{"Easy", "Medium", "Hard"})
+
 	m.applyRuneMap(&generatedMapString)
 	m.spawnPlayer(generatedMap)
 	m.spawnFurnitureFromGenerated(generatedMap)
 	m.addRandomFurniture()
 	m.spawnEnemiesAtRoutes(generatedMap)
-	m.spawnRoamingEnemies()
-	m.distributeLootBetweenCabinets()
+	m.spawnRoamingEnemies(mis.AdditionalGuardsNumber[difficulty])
+	m.distributeLootBetweenCabinets(mis.TotalLoot[difficulty])
 }
 
 func (m *missionInitializer) applyRuneMap(generated_map *[]string) {
@@ -163,11 +177,11 @@ func (m *missionInitializer) spawnEnemiesAtRoutes(l *generator2.Level) {
 	}
 }
 
-func (m *missionInitializer) spawnRoamingEnemies() {
+func (m *missionInitializer) spawnRoamingEnemies(roamingEnemiesCount int) {
 	x := -1
 	y := -1
 	w, h := CURRENT_MAP.getSize()
-	for i := 0; i < m.roamingEnemiesCount; i++ {
+	for i := 0; i < roamingEnemiesCount; i++ {
 		for !CURRENT_MAP.isTilePassableAndNotOccupied(x, y) {
 			x, y = rnd.Rand(w), rnd.Rand(h)
 		}
@@ -176,14 +190,14 @@ func (m *missionInitializer) spawnRoamingEnemies() {
 	}
 }
 
-func (m *missionInitializer) distributeLootBetweenCabinets() {
+func (m *missionInitializer) distributeLootBetweenCabinets(totalDesiredLootAmount int) {
 	totalCabinetsOnMap := 0
 	for _, f := range CURRENT_MAP.furnitures {
 		if f.code == FURNITURE_CABINET {
 			totalCabinetsOnMap++
 		}
 	}
-	avgGoldPerCabinet := m.totalDesiredLootAmount / totalCabinetsOnMap
+	avgGoldPerCabinet := totalDesiredLootAmount / totalCabinetsOnMap
 	minGoldPerCabinet := avgGoldPerCabinet - 25
 	if minGoldPerCabinet < 0 {
 		minGoldPerCabinet = 0

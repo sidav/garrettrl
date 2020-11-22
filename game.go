@@ -39,11 +39,8 @@ func (g *game) runGame() {
 	rnd.InitDefault()
 
 	GAME_IS_RUNNING = true
-	mInit := missionInitializer{
-		roamingEnemiesCount:    5,
-		totalDesiredLootAmount: 1000,
-	}
-	mInit.initializeMission(1)
+	mInit := missionInitializer{}
+	mInit.initializeMission(CURRENT_MISSION_NUMBER)
 
 	renderer.initDefaults()
 	for GAME_IS_RUNNING {

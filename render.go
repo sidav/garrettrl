@@ -327,7 +327,10 @@ func (c *consoleRenderer) renderCcellForceChar(cc *consoleCell, x, y int, char r
 }
 
 // puts wrapped text in rectangle.
-func (c *consoleRenderer) putTextInRect(text string, x, y, w, h int) {
+func (c *consoleRenderer) putTextInRect(text string, x, y, w int) {
+	if w == 0 {
+		w, _ = cw.GetConsoleSize()
+	}
 	cx, cy := x, y
 	splittedText := strings.Split(text, " ")
 	for _, word := range splittedText {
@@ -335,9 +338,9 @@ func (c *consoleRenderer) putTextInRect(text string, x, y, w, h int) {
 			cx = 0
 			cy += 1
 		}
-		if word != "\\n" {
-			cw.PutString(word+" ", cx, cy)
-			cx += len(word) + 2
+		if word != "\\n" && word != "" {
+			cw.PutString(word, cx, cy)
+			cx += len(word) + 1
 		}
 	}
 }

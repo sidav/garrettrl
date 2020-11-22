@@ -1,0 +1,24 @@
+{
+  "BriefingText": "Things got worse lately. I have almost no money left. It will be not so much longer before I will end up picking pockets on a marketplace. I hate even the thinkng of this. \\n Yet, it is not that bad. A friend of mine mentioned something about his lord leaving his mansion for some trip.",
+  "MissionType": 1,
+  "TargetNumber": [
+   1000,
+   1000,
+   1000
+  ],
+  "AdditionalGuardsNumber": [
+   0,
+   3,
+   6
+  ],
+  "Rewards": [
+   0,
+   0,
+   0
+  ],
+  "TotalLoot": [
+   1000,
+   1100,
+   1200
+  ]
+ }
