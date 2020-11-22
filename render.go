@@ -334,11 +334,11 @@ func (c *consoleRenderer) putTextInRect(text string, x, y, w int) {
 	cx, cy := x, y
 	splittedText := strings.Split(text, " ")
 	for _, word := range splittedText {
-		if cx-x + len(word) > w || word == "\\n" {
+		if cx-x + len(word) > w || word == "\\n" || word == "\n" {
 			cx = 0
 			cy += 1
 		}
-		if word != "\\n" && word != "" {
+		if word != "\\n" && word != "\n" {
 			cw.PutString(word, cx, cy)
 			cx += len(word) + 1
 		}

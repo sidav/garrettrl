@@ -7,7 +7,7 @@ import (
 
 type playerController struct {
 	currentSelectedArrowIndex int
-	previousHp int
+	previousHp                int
 }
 
 func (pc *playerController) playerControl(d *gameMap) {
@@ -20,7 +20,7 @@ func (pc *playerController) playerControl(d *gameMap) {
 	}
 	pc.previousHp = p.hp
 	renderer.renderGameScreen(true)
-	if pc.checkGameState() {
+	if pc.checkGameStop() {
 		return
 	}
 
@@ -68,7 +68,7 @@ func (pc *playerController) playerControl(d *gameMap) {
 				if p.inv.arrows[pc.currentSelectedArrowIndex].amount > 0 {
 					sx, sy := pc.selectCoords(true)
 					if sx == CURRENT_MAP.player.x && sy == CURRENT_MAP.player.y {
-						log.AppendMessage("Trying to suicide with " + p.inv.arrows[pc.currentSelectedArrowIndex].name + ", huh?" )
+						log.AppendMessage("Trying to suicide with " + p.inv.arrows[pc.currentSelectedArrowIndex].name + ", huh?")
 					} else if sx != -1 && sy != -1 {
 						applyArrowEffect(p.inv.arrows[pc.currentSelectedArrowIndex].name, sx, sy)
 						p.inv.arrows[pc.currentSelectedArrowIndex].amount--
@@ -152,8 +152,8 @@ func (pc *playerController) doCloseDoor() {
 	px, py := CURRENT_MAP.player.getCoords()
 	doorsAround := CURRENT_MAP.getNumberOfTilesOfTypeAround(TILE_DOOR, px, py)
 	if doorsAround == 1 {
-		for x := px-1; x <= px+1; x++ {
-			for y := py-1; y <= py+1; y++{
+		for x := px - 1; x <= px+1; x++ {
+			for y := py - 1; y <= py+1; y++ {
 				if CURRENT_MAP.isTileADoor(x, y) && CURRENT_MAP.tiles[x][y].isOpened {
 					CURRENT_MAP.tiles[x][y].isOpened = false
 					CURRENT_MAP.player.spendTurnsForAction(10)
@@ -173,22 +173,31 @@ func (pc *playerController) doCloseDoor() {
 	}
 }
 
-func (p *playerController) checkGameState() bool {
+func (p *playerController) checkGameStop() bool {
 	plr := CURRENT_MAP.player
 	if plr.hp <= 0 {
 		GAME_IS_RUNNING = false
 		gameover()
 		return true
 	}
-	w, h := CURRENT_MAP.getSize()
-	if plr.x == 0 || plr.x == w-1 || plr.y == 0 || plr.y == h-1 {
-		if plr.inv.gold >= 1000 {
-			GAME_IS_RUNNING = false
-			gamewon()
-			return true
-		} else {
-			log.AppendMessage("You need to collect at least 1000 gold before exfiltration!")
-		}
+	if p.checkWinning() {
+		GAME_IS_RUNNING = false
+		gamewon()
+		return true
 	}
 	return false
+}
+
+func (pc *playerController) checkWinning() bool {
+	won := false
+	plr := CURRENT_MAP.player
+	w, h := CURRENT_MAP.getSize()
+	isPlayerOnEdge := plr.x == 0 || plr.x == w-1 || plr.y == 0 || plr.y == h-1
+	switch currMission.MissionType {
+	case MISSION_STEAL_MINIMUM_LOOT:
+		won = isPlayerOnEdge && plr.inv.gold >= currMission.TargetNumber[currDifficultyNumber]
+	case MISSION_STEAL_KEY_ITEMS:
+		log.AppendMessage("No check for MISSION_STEAL_KEY_ITEMS")
+	}
+	return won
 }

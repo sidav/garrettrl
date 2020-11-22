@@ -32,24 +32,26 @@ func (m *missionInitializer) generateAndInitMap(filesPath string) {
 	}
 
 	// mission unmarshalling
-	mis := &Mission{}
+	currMission = &Mission{}
 	jsn, err := ioutil.ReadFile(filesPath+"mission.json")
 	if err == nil {
-		json.Unmarshal(jsn, mis)
+		json.Unmarshal(jsn, currMission)
 	} else {
 		panic(err)
 	}
-	renderer.putTextInRect(mis.BriefingText, 0, 0, 0)
+	renderer.putTextInRect(currMission.BriefingText, 0, 0, 0)
 	cw.ReadKey()
-	difficulty := console_menu.ShowSingleChoiceMenu("Select difficulty:", "", []string{"Easy", "Medium", "Hard"})
+	currDifficultyNumber = console_menu.ShowSingleChoiceMenu(
+		"Select difficulty:", currMission.DifficultyChoosingStr, currMission.DifficultyLevelsNames,
+	)
 
 	m.applyRuneMap(&generatedMapString)
 	m.spawnPlayer(generatedMap)
 	m.spawnFurnitureFromGenerated(generatedMap)
 	m.addRandomFurniture()
 	m.spawnEnemiesAtRoutes(generatedMap)
-	m.spawnRoamingEnemies(mis.AdditionalGuardsNumber[difficulty])
-	m.distributeLootBetweenCabinets(mis.TotalLoot[difficulty])
+	m.spawnRoamingEnemies(currMission.AdditionalGuardsNumber[currDifficultyNumber])
+	m.distributeLootBetweenCabinets(currMission.TotalLoot[currDifficultyNumber])
 }
 
 func (m *missionInitializer) applyRuneMap(generated_map *[]string) {

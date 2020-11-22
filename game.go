@@ -1,9 +1,9 @@
 package main
 
 import (
+	log2 "garrettrl/game_log"
 	cw "github.com/sidav/golibrl/console"
 	"github.com/sidav/golibrl/random/additive_random"
-	log2 "garrettrl/game_log"
 )
 
 var (
@@ -11,13 +11,15 @@ var (
 )
 
 var (
-	GAME_IS_RUNNING      bool
-	log                  log2.GameLog
-	rnd                  additive_random.FibRandom
-	renderer             consoleRenderer
-	currPlayerController playerController
-	CURRENT_TURN         int
-	CURRENT_MAP          gameMap
+	GAME_IS_RUNNING        bool
+	log                    log2.GameLog
+	rnd                    additive_random.FibRandom
+	renderer               consoleRenderer
+	currPlayerController   playerController
+	currMission            *Mission
+	currDifficultyNumber   int
+	CURRENT_TURN           int
+	CURRENT_MAP            gameMap
 	CURRENT_MISSION_NUMBER = 1
 )
 
@@ -87,7 +89,7 @@ func gameover() {
 
 func gamewon() {
 	cw.Clear_console()
-	cw.PutString("You won! Press ENTER to exit.", 0, 0)
+	cw.PutString(currMission.DebriefingText, 0, 0)
 	cw.Flush_console()
 	for cw.ReadKey() != "ENTER" {
 
