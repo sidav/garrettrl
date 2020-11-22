@@ -18,6 +18,7 @@ var (
 	currPlayerController playerController
 	CURRENT_TURN         int
 	CURRENT_MAP          gameMap
+	CURRENT_MISSION_NUMBER = 1
 )
 
 type game struct {
@@ -42,7 +43,7 @@ func (g *game) runGame() {
 		roamingEnemiesCount:    5,
 		totalDesiredLootAmount: 1000,
 	}
-	mInit.initializeMission()
+	mInit.initializeMission(1)
 
 	renderer.initDefaults()
 	for GAME_IS_RUNNING {

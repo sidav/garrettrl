@@ -10,15 +10,17 @@ type missionInitializer struct {
 	totalDesiredLootAmount int
 }
 
-func (m *missionInitializer) initializeMission() { //crap of course
+func (m *missionInitializer) initializeMission(missionNumber int) { //crap of course
 	CURRENT_MAP = gameMap{}
 	CURRENT_MAP.pawns = make([]*pawn, 0)
-	m.generateAndInitMap()
+	filesDir := fmt.Sprintf("missions/mission%d/", missionNumber)
+
+	m.generateAndInitMap(filesDir)
 }
 
-func (m *missionInitializer) generateAndInitMap() {
+func (m *missionInitializer) generateAndInitMap(filesPath string) {
 	generator := generator2.Generator{}
-	generatedMap := generator.Generate("parcels", "templates", 0, 0, 9)
+	generatedMap := generator.Generate(filesPath + "parcels", filesPath+ "templates", 0, 0, 9)
 	generatedMapString := make([]string, 0)
 	for i := range generatedMap.Terrain {
 		currStr := ""
