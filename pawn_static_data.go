@@ -102,6 +102,7 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 	PAWN_PLAYER: {
 		ccell: &consoleCell{
 			appearance: '@',
+			altAppearance: 224,
 			color:      console.WHITE,
 			inverse:    false,
 		},

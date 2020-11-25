@@ -21,6 +21,7 @@ var (
 	CURRENT_TURN           int
 	CURRENT_MAP            gameMap
 	CURRENT_MISSION_NUMBER = 1
+	USE_ALT_RUNES          bool
 )
 
 type game struct {

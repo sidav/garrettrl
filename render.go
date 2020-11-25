@@ -301,7 +301,7 @@ func (c *consoleRenderer) renderCcell(cc *consoleCell, x, y int) {
 		cw.SetFgColor(cc.color)
 		cw.SetBgColor(cw.BLACK)
 	}
-	cw.PutChar(cc.appearance, x, y)
+	cw.PutChar(cc.getAppearance(), x, y)
 }
 
 func (c *consoleRenderer) renderCcellForceColor(cc *consoleCell, x, y int, color int, forceInverse bool) {
@@ -312,7 +312,7 @@ func (c *consoleRenderer) renderCcellForceColor(cc *consoleCell, x, y int, color
 		cw.SetFgColor(color)
 		cw.SetBgColor(cw.BLACK)
 	}
-	cw.PutChar(cc.appearance, x, y)
+	cw.PutChar(cc.getAppearance(), x, y)
 }
 
 func (c *consoleRenderer) renderCcellForceChar(cc *consoleCell, x, y int, char rune) {
