@@ -28,7 +28,7 @@ func (pc *playerController) playerControl(d *gameMap) {
 	movex := 0
 	movey := 0
 	for !valid_key_pressed {
-		key_pressed := console.ReadKey()
+		key_pressed := console.ReadKeyAsync()
 		valid_key_pressed = true
 		movex, movey = pc.keyToDirection(key_pressed)
 		if movex == 0 && movey == 0 {
@@ -129,7 +129,7 @@ func (pc *playerController) selectCoords(forceVisible bool) (int, int) {
 	for {
 		renderer.renderGameScreen(false)
 		renderer.renderCursor(sx, sy, true)
-		key := console.ReadKey()
+		key := console.ReadKeyAsync()
 		if key == "ENTER" || key == "f" {
 			if !forceVisible || CURRENT_MAP.currentPlayerVisibilityMap[sx][sy] {
 				break
@@ -163,7 +163,7 @@ func (pc *playerController) doCloseDoor() {
 	} else if doorsAround > 1 {
 		log.AppendMessage("Which direction?")
 		renderer.renderLog(true)
-		dirx, diry := pc.keyToDirection(console.ReadKey())
+		dirx, diry := pc.keyToDirection(console.ReadKeyAsync())
 		if dirx != 0 || diry != 0 {
 			if CURRENT_MAP.isTileADoor(px+dirx, py+diry) {
 				CURRENT_MAP.tiles[px+dirx][py+diry].isOpened = false

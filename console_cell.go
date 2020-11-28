@@ -2,7 +2,7 @@ package main
 
 type consoleCell struct {
 	appearance    rune
-	altAppearance rune
+	altAppearance rune // if the font contains special tile-like symbols
 	color         int
 	inverse       bool
 }

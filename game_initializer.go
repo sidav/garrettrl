@@ -39,14 +39,23 @@ func (m *missionInitializer) generateAndInitMap(filesPath string) {
 	} else {
 		panic(err)
 	}
+	// show briefing
 	renderer.putTextInRect(currMission.BriefingText, 0, 0, 0)
-	cw.ReadKey()
+	key := cw.ReadKeyAsync()
+	for key != "ESCAPE" && key != "ENTER" {
+		key = cw.ReadKeyAsync()
+	}
 	currDifficultyNumber = console_menu.ShowSingleChoiceMenu(
 		"Select difficulty:", currMission.DifficultyChoosingStr, currMission.DifficultyLevelsNames,
 	)
 
 	m.applyRuneMap(&generatedMapString)
 	m.spawnPlayer(generatedMap)
+	// access buy menu only after the player is spawned.
+	CURRENT_MAP.player.inv.gold = 500 //TODO: REMOVE!!!1
+	bm := initBuyMenu(CURRENT_MAP.player.inv)
+	bm.accessBuyMenu(CURRENT_MAP.player.inv)
+
 	m.spawnFurnitureFromGenerated(generatedMap)
 	m.addRandomFurniture()
 	m.spawnEnemiesAtRoutes(generatedMap)
@@ -83,8 +92,8 @@ func (m *missionInitializer) spawnPlayer(l *generator2.Level) {
 	CURRENT_MAP.player = initNewPawn(PAWN_PLAYER, 1, 1, false)
 	CURRENT_MAP.player.inv = &inventory{}
 	CURRENT_MAP.player.inv.init()
-	CURRENT_MAP.player.inv.arrows[0].amount = 2
-	CURRENT_MAP.player.inv.arrows[1].amount = 1
+	//CURRENT_MAP.player.inv.arrows[0].amount = 2
+	//CURRENT_MAP.player.inv.arrows[1].amount = 1
 	// check if generated map has an entry point
 	// and select one at random
 	entrypoints := make([][2]int, 0)

@@ -345,6 +345,24 @@ func (c *consoleRenderer) putTextInRect(text string, x, y, w int) {
 	}
 }
 
+func (r *consoleRenderer) renderBuyMenu(bm *buyMenu) {
+	cw.Clear_console()
+	cw.SetColor(cw.BLACK, cw.DARK_GREEN)
+	cw.PutString("     BLACK MARKET     ", 0, 0)
+	cw.PutString(fmt.Sprintf("I have %d gold.", bm.currentGold), 0, 1)
+	for i := range bm.itemsNames {
+		if i == bm.cursorPosition {
+			cw.SetColor(cw.BLACK, cw.BEIGE)
+		} else {
+			cw.SetColor(cw.BEIGE, cw.BLACK)
+		}
+		cw.PutString(fmt.Sprintf("%s (%d gold)    < %d >", bm.itemsNames[i], bm.itemsCosts[i], bm.itemsBought[i]),
+			0, i+2)
+	}
+	cw.Flush_console()
+}
+
+
 //func renderLine(char rune, fromx, fromy, tox, toy int, flush, exceptFirstAndLast bool) {
 //	line := routines.GetLine(fromx, fromy, tox, toy)
 //	SetFgColor(RED)

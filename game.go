@@ -83,7 +83,7 @@ func gameover() {
 	cw.Clear_console()
 	cw.PutString("You are dead! Press ENTER to exit.", 0, 0)
 	cw.Flush_console()
-	for cw.ReadKey() != "ENTER" {
+	for cw.ReadKeyAsync() != "ENTER" {
 
 	}
 }
@@ -92,7 +92,7 @@ func gamewon() {
 	cw.Clear_console()
 	cw.PutString(currMission.DebriefingText, 0, 0)
 	cw.Flush_console()
-	for cw.ReadKey() != "ENTER" {
+	for cw.ReadKeyAsync() != "ENTER" {
 
 	}
 }
