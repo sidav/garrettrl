@@ -29,12 +29,23 @@ var tileStaticTable = map[tileCode]tileStaticData{
 			inverse:    true,
 		},
 	},
+	TILE_FLOOR: {
+		blocksMovement: false,
+		blocksVision:   false,
+		appearance: &consoleCell{
+			appearance: '.',
+			altAppearance: 240,
+			color:      cw.YELLOW,
+			inverse:    false,
+		},
+	},
 	TILE_RUBBISH: {
 		blocksMovement: false,
 		blocksVision:   false,
 		alwaysMakesNoise: true,
 		appearance: &consoleCell{
 			appearance: ',',
+			altAppearance: 241,
 			color:      cw.YELLOW,
 			inverse:    false,
 		},
@@ -44,6 +55,7 @@ var tileStaticTable = map[tileCode]tileStaticData{
 		blocksVision:   true,
 		appearance: &consoleCell{
 			appearance: ' ',
+			altAppearance: 242,
 			color:      cw.DARK_RED,
 			inverse:    true,
 		},
@@ -53,16 +65,8 @@ var tileStaticTable = map[tileCode]tileStaticData{
 		blocksVision:   true,
 		appearance: &consoleCell{
 			appearance: '+',
+			altAppearance: 243,
 			color:      cw.DARK_YELLOW,
-			inverse:    false,
-		},
-	},
-	TILE_FLOOR: {
-		blocksMovement: false,
-		blocksVision:   false,
-		appearance: &consoleCell{
-			appearance: '.',
-			color:      cw.YELLOW,
 			inverse:    false,
 		},
 	},
@@ -71,6 +75,7 @@ var tileStaticTable = map[tileCode]tileStaticData{
 		blocksVision:   false,
 		appearance: &consoleCell{
 			appearance: '#',
+			altAppearance: 245,
 			color:      cw.CYAN,
 			inverse:    false,
 		},

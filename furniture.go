@@ -58,6 +58,7 @@ var furnitureStaticTable = map[furnitureCode]furnitureStaticData{
 		lightStrength: 5,
 		appearance: &consoleCell{
 			appearance: '|',
+			altAppearance: 208,
 			color:      cw.DARK_GRAY,
 			inverse:    false,
 		},
@@ -68,6 +69,7 @@ var furnitureStaticTable = map[furnitureCode]furnitureStaticData{
 		lightStrength: 0,
 		appearance: &consoleCell{
 			appearance: '&',
+			altAppearance: 209,
 			color:      cw.DARK_GRAY,
 			inverse:    false,
 		},
@@ -77,6 +79,7 @@ var furnitureStaticTable = map[furnitureCode]furnitureStaticData{
 		lightStrength: 0,
 		appearance: &consoleCell{
 			appearance: '=',
+			altAppearance: 210,
 			color:      cw.WHITE,
 			inverse:    false,
 		},
@@ -87,6 +90,7 @@ var furnitureStaticTable = map[furnitureCode]furnitureStaticData{
 		lightStrength: 0,
 		appearance: &consoleCell{
 			appearance: '*',
+			altAppearance: 211,
 			color:      cw.DARK_GREEN,
 			inverse:    false,
 		},

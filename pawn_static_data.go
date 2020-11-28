@@ -45,6 +45,7 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 	PAWN_GUARD: {
 		ccell: &consoleCell{
 			appearance: 'G',
+			altAppearance: 225,
 			color:      console.RED,
 			inverse:    false,
 		},
