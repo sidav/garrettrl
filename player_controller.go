@@ -88,8 +88,9 @@ func (pc *playerController) playerControl(d *gameMap) {
 				}
 			case "DELETE":
 				p.hp += rnd.Rand(5)
-			case "NOTHING":
+			case "NOTHING", "NON-KEY":
 				time.Sleep(25 * time.Millisecond)
+				valid_key_pressed = false
 			default:
 				valid_key_pressed = false
 				log.AppendMessagef("Unknown key %s (Wrong keyboard layout?)", key_pressed)
