@@ -7,6 +7,7 @@ type responseSituation uint8
 
 const (
 	PAWN_GUARD pawnCode = iota
+	PAWN_ARCHER
 	PAWN_PLAYER
 )
 
@@ -21,6 +22,9 @@ const (
 
 type pawnStaticData struct {
 	ccell *consoleCell
+
+	canShoot bool
+
 	name  string
 	maxhp int
 
@@ -44,10 +48,10 @@ func (p *pawnStaticData) getRandomResponseTo(situation responseSituation) string
 var pawnStaticTable = map[pawnCode]pawnStaticData{
 	PAWN_GUARD: {
 		ccell: &consoleCell{
-			appearance: 'G',
+			appearance:    'G',
 			altAppearance: 225,
-			color:      console.RED,
-			inverse:    false,
+			color:         console.RED,
+			inverse:       false,
 		},
 		name:                  "Guard",
 		maxhp:                 3,
@@ -100,12 +104,64 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 			},
 		},
 	},
+	PAWN_ARCHER: {
+		ccell: &consoleCell{
+			appearance:    'A',
+			altAppearance: 225,
+			color:         console.RED,
+			inverse:       false,
+		},
+		name:                  "Archer",
+		canShoot:              true,
+		maxhp:                 3,
+		timeForWalking:        12,
+		timeForRunning:        9,
+		runningNoiseIntensity: 10,
+		walkingNoiseIntensity: 7,
+
+		sightRangeAlerted:     9,
+		sightRangeAlertedDark: 3,
+		sightRangeCalm:        6,
+		responsesForSituations: map[responseSituation][]string{
+			SITUATION_IDLE_CHATTER: {
+				"* Yawn *",
+				"* Yawn *", // duplicate intended.
+			},
+			SITUATION_NOISE: {
+				"What was that?",
+				"Huh?",
+				"Did you hear that?",
+			},
+			SITUATION_ENEMY_SIGHTED: {
+				"Is someone there?",
+				"Hey, stop, you taffer!",
+				"I just saw something...",
+			},
+			SITUATION_STARTING_PURSUIT: {
+				"There you are!",
+				"Don't run, taffer!",
+				"Haha! I see ya, thief!",
+			},
+			SITUATION_ENEMY_DISAPPEARED: {
+				"Where did he go?",
+				"I'll find thee, taffer.",
+				"You think you can hide?",
+				"Show yourself!",
+			},
+			SITUATION_SEARCH_STOPPED: {
+				"Nothing.",
+				"Taff it.",
+				"Too much coffee.",
+				"I'll better return.",
+			},
+		},
+	},
 	PAWN_PLAYER: {
 		ccell: &consoleCell{
-			appearance: '@',
+			appearance:    '@',
 			altAppearance: 224,
-			color:      console.WHITE,
-			inverse:    false,
+			color:         console.WHITE,
+			inverse:       false,
 		},
 		sightRangeAlerted:     10,
 		name:                  "Taffer",

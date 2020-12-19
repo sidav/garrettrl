@@ -60,6 +60,7 @@ func (m *missionInitializer) generateAndInitMap(filesPath string) {
 	m.addRandomFurniture()
 	m.spawnEnemiesAtRoutes(generatedMap)
 	m.spawnRoamingEnemies(currMission.AdditionalGuardsNumber[currDifficultyNumber])
+	m.makeGuardsTheArchers()
 	m.distributeLootBetweenCabinets(currMission.TotalLoot[currDifficultyNumber])
 	m.putTargetItems()
 }
@@ -199,6 +200,15 @@ func (m *missionInitializer) spawnRoamingEnemies(roamingEnemiesCount int) {
 		}
 		newEnemy := initNewPawn(PAWN_GUARD, x, y, true)
 		CURRENT_MAP.pawns = append(CURRENT_MAP.pawns, newEnemy)
+	}
+}
+
+func (m *missionInitializer) makeGuardsTheArchers() {
+	for i := 0; i < currMission.NumberOfArchersFromGuards[currDifficultyNumber]; i++ {
+		index := rnd.Rand(len(CURRENT_MAP.pawns))
+		if CURRENT_MAP.pawns[index].code == PAWN_GUARD {
+			CURRENT_MAP.pawns[index].code = PAWN_ARCHER
+		}
 	}
 }
 

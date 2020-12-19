@@ -17,8 +17,9 @@ type Mission struct {
 	TargetNumber           []int
 	TargetItemsNames       []string
 	AdditionalGuardsNumber []int
-	Rewards                []int
-	TotalLoot              []int
+	NumberOfArchersFromGuards []int
+	Rewards   []int
+	TotalLoot []int
 }
 
 func (m *Mission) readFromFile(filename string) {
