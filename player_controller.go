@@ -200,7 +200,7 @@ func (pc *playerController) checkWinning() bool {
 	case MISSION_STEAL_MINIMUM_LOOT:
 		won = isPlayerOnEdge && plr.inv.gold >= currMission.TargetNumber[currDifficultyNumber]
 	case MISSION_STEAL_TARGET_ITEMS:
-		log.AppendMessage("No check for MISSION_STEAL_TARGET_ITEMS")
+		won = isPlayerOnEdge && len(plr.inv.targetItems) == len(currMission.TargetItemsNames)
 	}
 	return won
 }

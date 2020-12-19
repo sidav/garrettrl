@@ -205,20 +205,36 @@ func (c *consoleRenderer) renderFurnitures() {
 func (c *consoleRenderer) renderSidebar() {
 	psd := CURRENT_MAP.player.getStaticData()
 	p := CURRENT_MAP.player
+	currLine := 0
 	cw.SetFgColor(cw.WHITE)
 	if p.isRunning {
-		cw.PutString(fmt.Sprintf("!! RUNNING !!"), c.R_VIEWPORT_WIDTH+1, 0)
+		cw.PutString(fmt.Sprintf("!! RUNNING !!"), c.R_VIEWPORT_WIDTH+1, currLine)
 	} else {
-		cw.PutString(fmt.Sprintf(".. sneaking .."), c.R_VIEWPORT_WIDTH+1, 0)
+		cw.PutString(fmt.Sprintf(".. sneaking .."), c.R_VIEWPORT_WIDTH+1, currLine)
 	}
-	cw.PutString(fmt.Sprintf("Health: %d/%d", CURRENT_MAP.player.hp, psd.maxhp), c.R_VIEWPORT_WIDTH+1, 1)
-	cw.PutString(fmt.Sprintf("Loot: %d", CURRENT_MAP.player.inv.gold), c.R_VIEWPORT_WIDTH+1, 2)
+	currLine++
+	cw.PutString(fmt.Sprintf("Health: %d/%d", CURRENT_MAP.player.hp, psd.maxhp), c.R_VIEWPORT_WIDTH+1, currLine)
+	currLine++
+	cw.PutString(fmt.Sprintf("Loot: %d", CURRENT_MAP.player.inv.gold), c.R_VIEWPORT_WIDTH+1, currLine)
+	currLine++
 	for i, arrow := range p.inv.arrows {
 		if currPlayerController.currentSelectedArrowIndex == i {
 			cw.SetColor(cw.BLACK, cw.WHITE)
 		}
-		cw.PutString(fmt.Sprintf("%s: %d", arrow.name, arrow.amount), c.R_VIEWPORT_WIDTH+1, 4+i)
+		cw.PutString(fmt.Sprintf("%s: %d", arrow.name, arrow.amount), c.R_VIEWPORT_WIDTH+1, currLine)
 		cw.SetColor(cw.WHITE, cw.BLACK)
+		currLine++
+	}
+	if len(p.inv.targetItems) > 0 {
+		cw.SetColor(cw.DARK_YELLOW, cw.BLACK)
+		cw.PutString(fmt.Sprintf("Target items (%d/%d):", len(p.inv.targetItems), len(currMission.TargetItemsNames)),
+			c.R_VIEWPORT_WIDTH+1, currLine)
+		cw.SetColor(cw.WHITE, cw.BLACK)
+		currLine++
+		for _, itemName := range p.inv.targetItems {
+			cw.PutString(" " + itemName, c.R_VIEWPORT_WIDTH+1, currLine)
+			currLine++
+		}
 	}
 }
 

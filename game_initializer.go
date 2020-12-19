@@ -16,7 +16,6 @@ func (m *missionInitializer) initializeMission(missionNumber int) { //crap of co
 	CURRENT_MAP = gameMap{}
 	CURRENT_MAP.pawns = make([]*pawn, 0)
 	filesDir := fmt.Sprintf("missions/mission%d/", missionNumber)
-	fmt.Println(filesDir)
 	m.generateAndInitMap(filesDir)
 }
 
@@ -62,6 +61,7 @@ func (m *missionInitializer) generateAndInitMap(filesPath string) {
 	m.spawnEnemiesAtRoutes(generatedMap)
 	m.spawnRoamingEnemies(currMission.AdditionalGuardsNumber[currDifficultyNumber])
 	m.distributeLootBetweenCabinets(currMission.TotalLoot[currDifficultyNumber])
+	m.putTargetItems()
 }
 
 func (m *missionInitializer) applyRuneMap(generated_map *[]string) {
@@ -237,5 +237,24 @@ func (m *missionInitializer) distributeLootBetweenCabinets(totalDesiredLootAmoun
 				f.inv.arrows[3].amount = 1
 			}
 		}
+	}
+}
+
+func (m *missionInitializer) putTargetItems() {
+	if len(currMission.TargetItemsNames) == 0 {
+		return
+	}
+	allContainers := make([]*furniture, 0)
+	for _, f := range CURRENT_MAP.furnitures {
+		if f.code == FURNITURE_CABINET {
+			allContainers = append(allContainers, f)
+		}
+	}
+	if len(allContainers) == 0 {
+		panic("Zero cabinets at putTargetItems attempt")
+	}
+	for _, item := range(currMission.TargetItemsNames) {
+		containerIndex := rnd.Rand(len(allContainers))
+		allContainers[containerIndex].inv.targetItems = append(allContainers[containerIndex].inv.targetItems, item)
 	}
 }

@@ -167,7 +167,6 @@ func (dung *gameMap) defaultMovementActionByVector(p *pawn, mayOpenDoor bool, vx
 		}
 		// steal from furniture (if the pawn is player)
 		if furn.canBeLooted() && p == dung.player {
-			p.inv.grabEverythingFromInventory(furn.inv)
 			stealString := fmt.Sprintf("Stole %d gold", furn.inv.gold)
 			for _, arrow := range furn.inv.arrows {
 				if arrow.amount == 1 {
@@ -176,7 +175,12 @@ func (dung *gameMap) defaultMovementActionByVector(p *pawn, mayOpenDoor bool, vx
 					stealString += fmt.Sprintf(", x%d %s", arrow.amount, arrow.name)
 				}
 			}
+			for _, str := range furn.inv.targetItems {
+				stealString += fmt.Sprintf(", %s", str)
+			}
 			stealString += "."
+
+			p.inv.grabEverythingFromInventory(furn.inv)
 			furn.inv = nil
 			log.AppendMessage(stealString)
 			// create noise?
