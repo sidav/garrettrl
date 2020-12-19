@@ -1,6 +1,6 @@
 {
   "BriefingText": "Well, in this very,very long briefing I got to know that I have to steal lord Manderley's family jewels. All three of them.",
-  "DebriefingText": "",
+  "DebriefingText": "I won.",
   "MissionType": 0,
   "DifficultyChoosingStr": "When should I go?",
   "DifficultyLevelsNames": [
@@ -8,7 +8,7 @@
    "Tomorrow night",
    "Tonight"
   ],
-  "TargetNumber": null,
+  "TargetNumber": [2, 3, 3],
   "TargetItemsNames": [
    "Family Diamond",
    "Family Emerald",

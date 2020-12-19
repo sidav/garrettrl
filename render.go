@@ -227,7 +227,7 @@ func (c *consoleRenderer) renderSidebar() {
 	}
 	if len(p.inv.targetItems) > 0 {
 		cw.SetColor(cw.DARK_YELLOW, cw.BLACK)
-		cw.PutString(fmt.Sprintf("Target items (%d/%d):", len(p.inv.targetItems), len(currMission.TargetItemsNames)),
+		cw.PutString(fmt.Sprintf("Target items (%d/%d):", len(p.inv.targetItems), currMission.TargetNumber[currDifficultyNumber]),
 			c.R_VIEWPORT_WIDTH+1, currLine)
 		cw.SetColor(cw.WHITE, cw.BLACK)
 		currLine++
