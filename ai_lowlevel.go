@@ -38,6 +38,21 @@ func (p *pawn) ai_hitAnotherPawn(t *pawn) {
 	}
 }
 
+func (p *pawn) ai_shootAnotherPawn(t *pawn) {
+	t.hp--
+	p.spendTurnsForAction(25)
+	CURRENT_MAP.createNoise(&noise{
+		creator:         p,
+		x:               p.x,
+		y:               p.y,
+		intensity:       4,
+		visual:          consoleCell{},
+		textBubble:      "* SHOOT! *",
+		suspicious:      true,
+		showOnlyNotSeen: false,
+	})
+}
+
 func (p *pawn) ai_canSeePlayer() bool {
 	x, y := p.getCoords()
 	px, py := CURRENT_MAP.player.getCoords()

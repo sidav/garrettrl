@@ -191,7 +191,11 @@ func (p *pawn) ai_actAlerted() {
 	ai := p.ai
 	var dirx, diry int
 	if ai.targetPawn != nil {
-		p.ai_tryToMoveToCoords(ai.targetPawn.x, ai.targetPawn.y)
+		if p.getStaticData().canShoot {
+			p.ai_shootAnotherPawn(ai.targetPawn)
+		} else {
+			p.ai_tryToMoveToCoords(ai.targetPawn.x, ai.targetPawn.y)
+		}
 	} else {
 		log.Warning("BUG: alerted AI without targetPawn. Please report.")
 		path := CURRENT_MAP.getPathFromTo(p.x, p.y, ai.searchx, ai.searchy, false)
