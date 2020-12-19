@@ -16,6 +16,7 @@ func (m *missionInitializer) initializeMission(missionNumber int) { //crap of co
 	CURRENT_MAP = gameMap{}
 	CURRENT_MAP.pawns = make([]*pawn, 0)
 	filesDir := fmt.Sprintf("missions/mission%d/", missionNumber)
+	fmt.Println(filesDir)
 	m.generateAndInitMap(filesDir)
 }
 

@@ -20,7 +20,7 @@ var (
 	currDifficultyNumber   int
 	CURRENT_TURN           int
 	CURRENT_MAP            gameMap
-	CURRENT_MISSION_NUMBER = 1
+	CURRENT_MISSION_NUMBER = 2
 	USE_ALT_RUNES          bool
 )
 
