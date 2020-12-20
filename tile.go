@@ -34,7 +34,7 @@ var tileStaticTable = map[tileCode]tileStaticData{
 		blocksVision:   false,
 		appearance: &consoleCell{
 			appearance: '.',
-			altAppearance: 240,
+			altAppearance: 240+10,
 			color:      cw.YELLOW,
 			inverse:    false,
 		},
@@ -45,7 +45,7 @@ var tileStaticTable = map[tileCode]tileStaticData{
 		alwaysMakesNoise: true,
 		appearance: &consoleCell{
 			appearance: ',',
-			altAppearance: 241,
+			altAppearance: 12*16,
 			color:      cw.YELLOW,
 			inverse:    false,
 		},

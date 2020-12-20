@@ -49,7 +49,7 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 	PAWN_GUARD: {
 		ccell: &consoleCell{
 			appearance:    'G',
-			altAppearance: 225,
+			altAppearance: 001,
 			color:         console.RED,
 			inverse:       false,
 		},
@@ -107,7 +107,7 @@ var pawnStaticTable = map[pawnCode]pawnStaticData{
 	PAWN_ARCHER: {
 		ccell: &consoleCell{
 			appearance:    'A',
-			altAppearance: 225,
+			altAppearance: 002,
 			color:         console.RED,
 			inverse:       false,
 		},
