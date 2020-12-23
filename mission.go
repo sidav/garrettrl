@@ -8,18 +8,19 @@ const (
 )
 
 type Mission struct {
-	BriefingText   string
-	DebriefingText string
+	BriefingText           string
+	DebriefingText         string
+	AdditionalStartingGold int
 
-	MissionType            missionTypeCode
-	DifficultyChoosingStr  string
-	DifficultyLevelsNames  []string
-	TargetNumber           []int
-	TargetItemsNames       []string
-	AdditionalGuardsNumber []int
+	MissionType               missionTypeCode
+	DifficultyChoosingStr     string
+	DifficultyLevelsNames     []string
+	TargetNumber              []int
+	TargetItemsNames          []string
+	AdditionalGuardsNumber    []int
 	NumberOfArchersFromGuards []int
-	Rewards   []int
-	TotalLoot []int
+	Rewards                   []int
+	TotalLoot                 []int
 }
 
 func (m *Mission) readFromFile(filename string) {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	log2 "garrettrl/game_log"
 	cw "github.com/sidav/golibrl/console"
 	"github.com/sidav/golibrl/random/additive_random"
@@ -12,6 +13,7 @@ var (
 
 var (
 	GAME_IS_RUNNING        bool
+	CURRENT_MISSION_WON    bool
 	log                    log2.GameLog
 	rnd                    additive_random.FibRandom
 	renderer               consoleRenderer
@@ -20,7 +22,7 @@ var (
 	currDifficultyNumber   int
 	CURRENT_TURN           int
 	CURRENT_MAP            gameMap
-	CURRENT_MISSION_NUMBER = 2
+	CURRENT_MISSION_NUMBER = 1
 	USE_ALT_RUNES          bool
 )
 
@@ -40,14 +42,21 @@ func (g *game) runGame() {
 	log.Init(5)
 	rnd = additive_random.FibRandom{}
 	rnd.InitDefault()
+	renderer.initDefaults()
 
 	GAME_IS_RUNNING = true
-	mInit := missionInitializer{}
-	mInit.initializeMission(CURRENT_MISSION_NUMBER)
 
-	renderer.initDefaults()
 	for GAME_IS_RUNNING {
-		g.mainLoop()
+		print(fmt.Sprintf("Init %d", CURRENT_MISSION_NUMBER))
+		mInit := missionInitializer{}
+		mInit.initializeMission(CURRENT_MISSION_NUMBER)
+
+		for GAME_IS_RUNNING && !CURRENT_MISSION_WON {
+			g.mainLoop()
+		}
+		CURRENT_MISSION_NUMBER++
+		CURRENT_MISSION_WON = false
+		CURRENT_TURN = 0
 	}
 }
 
@@ -55,7 +64,7 @@ func (g *game) mainLoop() {
 	CURRENT_MAP.recalculateLights()
 	CURRENT_MAP.currentPlayerVisibilityMap = *CURRENT_MAP.getFieldOfVisionFor(CURRENT_MAP.player)
 
-	for GAME_IS_RUNNING && CURRENT_MAP.player.isTimeToAct() {
+	for GAME_IS_RUNNING && !CURRENT_MISSION_WON && CURRENT_MAP.player.isTimeToAct() {
 		renderer.renderGameScreen(true)
 		currPlayerController.playerControl(&CURRENT_MAP)
 	}
@@ -83,6 +92,7 @@ func gameover() {
 	cw.Clear_console()
 	cw.PutString("You are dead! Press ENTER to exit.", 0, 0)
 	cw.Flush_console()
+	GAME_IS_RUNNING = false
 	for cw.ReadKeyAsync() != "ENTER" {
 
 	}
@@ -95,4 +105,5 @@ func gamewon() {
 	for cw.ReadKeyAsync() != "ENTER" {
 
 	}
+	CURRENT_MISSION_WON = true
 }

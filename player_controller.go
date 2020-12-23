@@ -179,12 +179,10 @@ func (pc *playerController) doCloseDoor() {
 func (p *playerController) checkGameStop() bool {
 	plr := CURRENT_MAP.player
 	if plr.hp <= 0 {
-		GAME_IS_RUNNING = false
 		gameover()
 		return true
 	}
 	if p.checkWinning() {
-		GAME_IS_RUNNING = false
 		gamewon()
 		return true
 	}

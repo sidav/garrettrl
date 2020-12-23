@@ -10,9 +10,13 @@ import (
 )
 
 type missionInitializer struct {
+	goldFromPreviousMission int
 }
 
 func (m *missionInitializer) initializeMission(missionNumber int) { //crap of course
+	if CURRENT_MAP.player != nil && CURRENT_MAP.player.inv != nil {
+		m.goldFromPreviousMission = CURRENT_MAP.player.inv.gold
+	}
 	CURRENT_MAP = gameMap{}
 	CURRENT_MAP.pawns = make([]*pawn, 0)
 	filesDir := fmt.Sprintf("missions/mission%d/", missionNumber)
@@ -39,8 +43,11 @@ func (m *missionInitializer) generateAndInitMap(filesPath string) {
 	} else {
 		panic(err)
 	}
+
 	// show briefing
+	cw.Clear_console()
 	renderer.putTextInRect(currMission.BriefingText, 0, 0, 0)
+	cw.Flush_console()
 	key := cw.ReadKeyAsync()
 	for key != "ESCAPE" && key != "ENTER" {
 		key = cw.ReadKeyAsync()
@@ -52,7 +59,6 @@ func (m *missionInitializer) generateAndInitMap(filesPath string) {
 	m.applyRuneMap(&generatedMapString)
 	m.spawnPlayer(generatedMap)
 	// access buy menu only after the player is spawned.
-	CURRENT_MAP.player.inv.gold = 500 //TODO: REMOVE!!!1
 	bm := initBuyMenu(CURRENT_MAP.player.inv)
 	bm.accessBuyMenu(CURRENT_MAP.player.inv)
 
@@ -94,6 +100,9 @@ func (m *missionInitializer) spawnPlayer(l *generator2.Level) {
 	CURRENT_MAP.player = initNewPawn(PAWN_PLAYER, 1, 1, false)
 	CURRENT_MAP.player.inv = &inventory{}
 	CURRENT_MAP.player.inv.init()
+	CURRENT_MAP.player.inv.gold += currMission.AdditionalStartingGold
+	CURRENT_MAP.player.inv.gold += m.goldFromPreviousMission
+
 	//CURRENT_MAP.player.inv.arrows[0].amount = 2
 	//CURRENT_MAP.player.inv.arrows[1].amount = 1
 	// check if generated map has an entry point
