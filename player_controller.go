@@ -166,11 +166,16 @@ func (pc *playerController) doCloseDoor() {
 	} else if doorsAround > 1 {
 		log.AppendMessage("Which direction?")
 		renderer.renderLog(true)
-		dirx, diry := pc.keyToDirection(console.ReadKeyAsync())
-		if dirx != 0 || diry != 0 {
-			if CURRENT_MAP.isTileADoor(px+dirx, py+diry) {
-				CURRENT_MAP.tiles[px+dirx][py+diry].isOpened = false
-				CURRENT_MAP.player.spendTurnsForAction(10)
+		dirx, diry := 0, 0
+		for dirx == 0 && diry == 0 {
+			dirx, diry = pc.keyToDirection(console.ReadKeyAsync())
+			if dirx != 0 || diry != 0 {
+				if CURRENT_MAP.isTileADoor(px+dirx, py+diry) {
+					CURRENT_MAP.tiles[px+dirx][py+diry].isOpened = false
+					CURRENT_MAP.player.spendTurnsForAction(10)
+				} else {
+					log.AppendMessage("Okay, then.")
+				}
 			}
 		}
 	}
