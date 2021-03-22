@@ -216,10 +216,10 @@ func (c *consoleRenderer) renderSidebar() {
 	}
 	c.addAlignedSidebarLine("Health:", fmt.Sprintf("%d/%d", CURRENT_MAP.player.hp, psd.maxhp), false)
 	c.addAlignedSidebarLine("Loot: ", fmt.Sprintf("%d", CURRENT_MAP.player.inv.gold), false)
-	c.addCenteredSidebarLine("ARROWS: ")
+	c.addCenteredSidebarLine( "Arrows:")
 	for i, arrow := range p.inv.arrows {
 		inverseLine := currPlayerController.currentSelectedArrowIndex == i
-		c.addAlignedSidebarLine(fmt.Sprintf("%s:", arrow.name), fmt.Sprintf("%d", arrow.amount), inverseLine)
+		c.addAlignedSidebarLine(fmt.Sprintf("%s:", strings.Replace(arrow.name, " arrow", "", 1)), fmt.Sprintf("%d", arrow.amount), inverseLine)
 	}
 	if len(p.inv.targetItems) > 0 {
 		cw.SetColor(cw.DARK_YELLOW, cw.BLACK)
@@ -243,6 +243,7 @@ func (c *consoleRenderer) addCenteredSidebarLine(line string) {
 }
 
 func (c *consoleRenderer) addAlignedSidebarLine(leftAligned, rightAligned string, inversion bool) {
+	const OFFSET = 2
 	wid, _ := cw.GetConsoleSize()
 	if inversion {
 		cw.SetBgColor(cw.WHITE)
@@ -257,10 +258,10 @@ func (c *consoleRenderer) addAlignedSidebarLine(leftAligned, rightAligned string
 		}
 	}
 	// put left aligned
-	spaces := strings.Repeat(" ", wid - c.R_VIEWPORT_WIDTH - len(leftAligned) - 1)
-	cw.PutString(leftAligned + spaces, c.R_VIEWPORT_WIDTH+1, c.currentSidebarLine)
+	spaces := strings.Repeat(" ", wid - c.R_VIEWPORT_WIDTH - len(leftAligned) - OFFSET*2)
+	cw.PutString(leftAligned + spaces, c.R_VIEWPORT_WIDTH+OFFSET, c.currentSidebarLine)
 	// put right aligned
-	cw.PutString(rightAligned, wid-len(rightAligned)-1, c.currentSidebarLine)
+	cw.PutString(rightAligned, wid-len(rightAligned)-OFFSET, c.currentSidebarLine)
 	c.currentSidebarLine++
 	cw.SetBgColor(cw.BLACK)
 	cw.SetFgColor(cw.WHITE)
