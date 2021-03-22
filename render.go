@@ -18,6 +18,7 @@ type consoleRenderer struct {
 	RENDER_DISABLE_LOS       bool
 	FogOfWarColor            int
 	darkColor                int
+	currentSidebarLine       int
 }
 
 func (c *consoleRenderer) initDefaults() {
@@ -79,7 +80,8 @@ func (c *consoleRenderer) coordsToViewport(x, y int) (int, int) {
 
 func (c *consoleRenderer) updateViewportCoords(p *pawn) {
 	c.R_VIEWPORT_CURR_X = p.x - c.R_VIEWPORT_WIDTH/2
-	c.R_VIEWPORT_CURR_Y = p.y - c.R_VIEWPORT_HEIGHT/2}
+	c.R_VIEWPORT_CURR_Y = p.y - c.R_VIEWPORT_HEIGHT/2
+}
 
 func (c *consoleRenderer) renderGameScreen(flush bool) {
 	c.updateBoundsIfNeccessary(false)
@@ -108,6 +110,7 @@ func (c *consoleRenderer) renderGameScreen(flush bool) {
 	inverse := furnUnderPlayer != nil && furnUnderPlayer.getStaticData().canBeUsedAsCover
 	c.renderPawn(CURRENT_MAP.player, inverse)
 
+	c.currentSidebarLine = 0
 	c.renderSidebar()
 	c.renderLog(false)
 
@@ -205,37 +208,62 @@ func (c *consoleRenderer) renderFurnitures() {
 func (c *consoleRenderer) renderSidebar() {
 	psd := CURRENT_MAP.player.getStaticData()
 	p := CURRENT_MAP.player
-	currLine := 0
 	cw.SetFgColor(cw.WHITE)
 	if p.isRunning {
-		cw.PutString(fmt.Sprintf("!! RUNNING !!"), c.R_VIEWPORT_WIDTH+1, currLine)
+		c.addCenteredSidebarLine("!! RUNNING !!")
 	} else {
-		cw.PutString(fmt.Sprintf(".. sneaking .."), c.R_VIEWPORT_WIDTH+1, currLine)
+		c.addCenteredSidebarLine(".. sneaking ..")
 	}
-	currLine++
-	cw.PutString(fmt.Sprintf("Health: %d/%d", CURRENT_MAP.player.hp, psd.maxhp), c.R_VIEWPORT_WIDTH+1, currLine)
-	currLine++
-	cw.PutString(fmt.Sprintf("Loot: %d", CURRENT_MAP.player.inv.gold), c.R_VIEWPORT_WIDTH+1, currLine)
-	currLine++
+	c.addAlignedSidebarLine("Health:", fmt.Sprintf("%d/%d", CURRENT_MAP.player.hp, psd.maxhp), false)
+	c.addAlignedSidebarLine("Loot: ", fmt.Sprintf("%d", CURRENT_MAP.player.inv.gold), false)
+	c.addCenteredSidebarLine("ARROWS: ")
 	for i, arrow := range p.inv.arrows {
-		if currPlayerController.currentSelectedArrowIndex == i {
-			cw.SetColor(cw.BLACK, cw.WHITE)
-		}
-		cw.PutString(fmt.Sprintf("%s: %d", arrow.name, arrow.amount), c.R_VIEWPORT_WIDTH+1, currLine)
-		cw.SetColor(cw.WHITE, cw.BLACK)
-		currLine++
+		inverseLine := currPlayerController.currentSelectedArrowIndex == i
+		c.addAlignedSidebarLine(fmt.Sprintf("%s:", arrow.name), fmt.Sprintf("%d", arrow.amount), inverseLine)
 	}
 	if len(p.inv.targetItems) > 0 {
 		cw.SetColor(cw.DARK_YELLOW, cw.BLACK)
-		cw.PutString(fmt.Sprintf("Target items (%d/%d):", len(p.inv.targetItems), currMission.TargetNumber[currDifficultyNumber]),
-			c.R_VIEWPORT_WIDTH+1, currLine)
+		c.addCenteredSidebarLine(fmt.Sprintf("Target items (%d/%d):", len(p.inv.targetItems), currMission.TargetNumber[currDifficultyNumber]), )
 		cw.SetColor(cw.WHITE, cw.BLACK)
-		currLine++
 		for _, itemName := range p.inv.targetItems {
-			cw.PutString(" " + itemName, c.R_VIEWPORT_WIDTH+1, currLine)
-			currLine++
+			c.addAlignedSidebarLine(" "+itemName, "", false)
 		}
 	}
+}
+
+func (c *consoleRenderer) addCenteredSidebarLine(line string) {
+	wid, _ := cw.GetConsoleSize()
+	cw.SetFgColor(cw.WHITE)
+	if c.currentSidebarLine % 2 == 1 {
+		cw.SetFgColor(cw.BEIGE)
+	}
+	centeredCoords := c.R_VIEWPORT_WIDTH + (wid - c.R_VIEWPORT_WIDTH)/2 - len(line)/2
+	cw.PutString(line, centeredCoords, c.currentSidebarLine)
+	c.currentSidebarLine++
+}
+
+func (c *consoleRenderer) addAlignedSidebarLine(leftAligned, rightAligned string, inversion bool) {
+	wid, _ := cw.GetConsoleSize()
+	if inversion {
+		cw.SetBgColor(cw.WHITE)
+		cw.SetFgColor(cw.BLACK)
+		if c.currentSidebarLine%2 == 1 {
+			cw.SetBgColor(cw.BEIGE)
+		}
+	} else {
+		cw.SetFgColor(cw.WHITE)
+		if c.currentSidebarLine%2 == 1 {
+			cw.SetFgColor(cw.BEIGE)
+		}
+	}
+	// put left aligned
+	spaces := strings.Repeat(" ", wid - c.R_VIEWPORT_WIDTH - len(leftAligned) - 1)
+	cw.PutString(leftAligned + spaces, c.R_VIEWPORT_WIDTH+1, c.currentSidebarLine)
+	// put right aligned
+	cw.PutString(rightAligned, wid-len(rightAligned)-1, c.currentSidebarLine)
+	c.currentSidebarLine++
+	cw.SetBgColor(cw.BLACK)
+	cw.SetFgColor(cw.WHITE)
 }
 
 func (c *consoleRenderer) renderDamageFlash() {
@@ -350,7 +378,7 @@ func (c *consoleRenderer) putTextInRect(text string, x, y, w int) {
 	cx, cy := x, y
 	splittedText := strings.Split(text, " ")
 	for _, word := range splittedText {
-		if cx-x + len(word) > w || word == "\\n" || word == "\n" {
+		if cx-x+len(word) > w || word == "\\n" || word == "\n" {
 			cx = 0
 			cy += 1
 		}
@@ -377,7 +405,6 @@ func (r *consoleRenderer) renderBuyMenu(bm *buyMenu) {
 	}
 	cw.Flush_console()
 }
-
 
 //func renderLine(char rune, fromx, fromy, tox, toy int, flush, exceptFirstAndLast bool) {
 //	line := routines.GetLine(fromx, fromy, tox, toy)
