@@ -380,7 +380,7 @@ func (c *consoleRenderer) putTextInRect(text string, x, y, w int) {
 	splittedText := strings.Split(text, " ")
 	for _, word := range splittedText {
 		if cx-x+len(word) > w || word == "\\n" || word == "\n" {
-			cx = 0
+			cx = x
 			cy += 1
 		}
 		if word != "\\n" && word != "\n" {
@@ -404,6 +404,45 @@ func (r *consoleRenderer) renderBuyMenu(bm *buyMenu) {
 		cw.PutString(fmt.Sprintf("%s (%d gold)    < %d >", bm.itemsNames[i], bm.itemsCosts[i], bm.itemsBought[i]),
 			0, i+2)
 	}
+	cw.Flush_console()
+}
+
+func (r *consoleRenderer) renderHelpMenu(hm *helpMenu) {
+	w, h := cw.GetConsoleSize()
+	xOffset := w/6
+	const yOffset = 3
+	const categoriesWidth = 15
+	cw.SetColor(cw.BLACK, cw.DARK_GREEN)
+	for x := xOffset; x < w -xOffset; x++ {
+		for y := yOffset; y < h-yOffset; y++ {
+			cw.PutChar(' ', x, y)
+		}
+	}
+	cw.SetColor(cw.DARK_GREEN, cw.BLACK)
+	cw.PutString(hm.header, w/2-len(hm.header)/2, yOffset)
+	// categories
+	for x := xOffset +1; x < xOffset+ categoriesWidth; x++ {
+		for y := yOffset +1; y < h-yOffset-1; y++ {
+			cw.PutChar(' ', x, y)
+		}
+	}
+	for i, name := range hm.categoryNames {
+		cw.SetColor(cw.WHITE, cw.BLACK)
+		if i == hm.currentOpenedCategory {
+			cw.SetColor(cw.BLACK, cw.WHITE)
+		}
+		cw.PutString(name, xOffset+1, i+yOffset+1)
+	}
+
+	// help text
+	cw.SetColor(cw.WHITE, cw.BLACK)
+	helpRectW := w- xOffset -1 - (xOffset + categoriesWidth + 1)
+	for x := xOffset + categoriesWidth + 1; x < w-xOffset-1; x++ {
+		for y := yOffset +1; y < h-yOffset-1; y++ {
+			cw.PutChar(' ', x, y)
+		}
+	}
+	r.putTextInRect(hm.categoryHelps[hm.currentOpenedCategory], xOffset+ categoriesWidth + 1, yOffset+1, helpRectW)
 	cw.Flush_console()
 }
 

@@ -63,6 +63,11 @@ func (pc *playerController) playerControl(d *gameMap) {
 				break
 			case "c":
 				pc.doCloseDoor()
+			case "F1":
+				hm := initHelpMenu()
+				hm.accessHelpMenu()
+				valid_key_pressed = false
+				renderer.renderGameScreen(true)
 			case "f": // fire arrow
 				log.AppendMessage("Select a target.")
 				if p.inv.arrows[pc.currentSelectedArrowIndex].amount > 0 {
