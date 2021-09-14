@@ -5,8 +5,8 @@ import (
 	"fmt"
 	cw "github.com/sidav/golibrl/console"
 	"github.com/sidav/golibrl/console_menu"
+	generator2 "github.com/sidav/parcelcreationtool/generator"
 	"io/ioutil"
-	generator2 "parcelcreationtool/generator"
 )
 
 type missionInitializer struct {

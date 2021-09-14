@@ -37,9 +37,18 @@ func (d *gameMap) recalculatePathfindingCostMap(considerPawns bool) {
 func (d *gameMap) getPathFromTo(fx, fy, tx, ty int, considerPawns bool) *astar.Cell {
 	d.recalculatePathfindingCostMap(considerPawns)
 	var path *astar.Cell
+	pathfinder := astar.AStarPathfinder{
+		DiagonalMoveAllowed:       true,
+		ForceGetPath:              true,
+		ForceIncludeFinish:        true,
+		AutoAdjustDefaultMaxSteps: false,
+	}
 	for i := range pathfindingDepths {
-		path = astar.FindPath(&d.pathfindingCostMap, fx, fy, tx, ty, true,
-			pathfindingDepths[i], true, true)
+		// TODO: remove when pathfinder will be updated with selectable max steps
+		if i > 1 {
+			break
+		}
+		path = pathfinder.FindPath(&d.pathfindingCostMap, fx, fy, tx, ty)
 		if checkIfPathLeadsToFinish(path, tx, ty) {
 			// log.AppendMessagef("Finished with %d depth", pathfindingDepths[i])
 			break

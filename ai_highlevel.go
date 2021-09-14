@@ -1,6 +1,6 @@
 package main
 
-import "parcelcreationtool/parcel"
+import "github.com/sidav/parcelcreationtool/parcel"
 
 type aiState uint8
 
